@@ -1,0 +1,11 @@
+[
+{
+  "modid": "WIT",
+  "name": "WIT",
+  "description": "What Is That?",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "authors": [ "SilentChaos512" ]
+}
+]
