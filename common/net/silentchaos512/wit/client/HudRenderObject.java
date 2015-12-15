@@ -25,13 +25,14 @@ public class HudRenderObject {
 
   public static final int VERTICAL_LINE_SPACING = 2;
   public static final int BACKGROUND_PADDING = 3;
-  public static final int BACKGROUND_TRANSITION_TIME = 16;
+  public static final int BACKGROUND_TRANSITION_TIME = 4;
 
   public static double backgroundHeight = 0.0;
   public static int lastMaxBackgroundWidth = 0;
   public static int lastMaxBackgroundHeight = 0;
   public static int lastBackgroundPosX = 0;
   public static int lastBackgroundPosY = 0;
+  public static float lastPartialTicks = 0f;
 
   BlockStackInfo blockInfo = null;
   EntityInfo entityInfo = null;
@@ -80,14 +81,21 @@ public class HudRenderObject {
   public static void adjustBackgroundHeight(RenderGameOverlayEvent event, int maxHeight,
       boolean expand) {
 
+    // System.out.println(event.partialTicks);
+    float time = event.partialTicks - lastPartialTicks;
+    if (time < 0f) {
+      time += 1f;
+    }
+    lastPartialTicks = event.partialTicks;
+
     lastMaxBackgroundHeight = maxHeight;
     if (backgroundHeight > maxHeight || !expand) {
-      backgroundHeight -= event.partialTicks * maxHeight / BACKGROUND_TRANSITION_TIME;
+      backgroundHeight -= time * maxHeight / BACKGROUND_TRANSITION_TIME;
       if (backgroundHeight < 0.0) {
         backgroundHeight = 0.0;
       }
     } else if (expand) {
-      backgroundHeight += event.partialTicks * maxHeight / BACKGROUND_TRANSITION_TIME;
+      backgroundHeight += time * maxHeight / BACKGROUND_TRANSITION_TIME;
       if (backgroundHeight > maxHeight) {
         backgroundHeight = maxHeight;
       }
