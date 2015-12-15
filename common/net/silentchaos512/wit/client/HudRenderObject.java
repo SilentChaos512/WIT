@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
@@ -20,6 +21,7 @@ import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
+import net.silentchaos512.wit.info.ItemStackInfo;
 
 public class HudRenderObject {
 
@@ -35,6 +37,7 @@ public class HudRenderObject {
   public static float lastPartialTicks = 0f;
 
   BlockStackInfo blockInfo = null;
+  ItemStackInfo itemInfo = null;
   EntityInfo entityInfo = null;
 
   List<String> lines = Lists.newArrayList();
@@ -46,13 +49,19 @@ public class HudRenderObject {
   public HudRenderObject(BlockStackInfo blockInfo) {
 
     this.blockInfo = blockInfo;
-    getLinesForBlock();
+    getLinesForBlock(blockInfo);
+  }
+
+  public HudRenderObject(ItemStackInfo itemInfo) {
+
+    this.itemInfo = itemInfo;
+    getLinesForItem(itemInfo);
   }
 
   public HudRenderObject(EntityInfo entityInfo) {
 
     this.entityInfo = entityInfo;
-    getLinesForEntity();
+    getLinesForEntity(entityInfo);
   }
 
   public void render(RenderGameOverlayEvent event) {
@@ -133,31 +142,51 @@ public class HudRenderObject {
     tessellator.draw();
   }
 
-  public void getLinesForBlock() {
+  public void getLinesForBlock(BlockStackInfo info) {
 
     // Name, ID, meta, tile entity
-    String line = blockInfo.item.getRarity(blockInfo.stack).rarityColor + blockInfo.localizedName;
-    line += shouldDisplayIdMeta() ? " [" + blockInfo.blockId + ":" + blockInfo.meta + "]" : "";
-    if (blockInfo.tileEntity != null) {
+    String line = info.item.getRarity(info.stack).rarityColor + info.localizedName;
+    line += shouldDisplayIdMeta() ? " [" + info.blockId + ":" + info.meta + "]" : "";
+    if (info.tileEntity != null) {
       line += EnumChatFormatting.GRAY + " (TE)";
     }
     lines.add(line);
 
     // Full name
     if (shouldDisplayResourceName()) {
-      lines.add(format(Config.formatResourceName) + blockInfo.modId + ":"
-          + blockInfo.resourceLocation.getResourcePath());
+      lines.add(format(Config.formatResourceName) + info.modId + ":"
+          + info.resourceLocation.getResourcePath());
     }
 
     // Mod name
     if (shouldDisplayModName()) {
-      lines.add(format(Config.formatModName) + blockInfo.modName);
+      lines.add(format(Config.formatModName) + info.modName);
     }
   }
 
-  public void getLinesForEntity() {
+  public void getLinesForItem(ItemStackInfo info) {
 
-    Entity entity = entityInfo.entity;
+    // Name, ID, meta, tile entity
+    String line = info.item.getRarity(info.stack).rarityColor + info.localizedName;
+    line += shouldDisplayIdMeta()
+        ? " [" + Item.getIdFromItem(info.item) + ":" + info.stack.getItemDamage() + "]" : "";
+    lines.add(line);
+
+    // Full name
+    if (shouldDisplayResourceName()) {
+      lines.add(format(Config.formatResourceName) + info.modId + ":"
+          + info.resourceLocation.getResourcePath());
+    }
+
+    // Mod name
+    if (shouldDisplayModName()) {
+      lines.add(format(Config.formatModName) + info.modName);
+    }
+  }
+
+  public void getLinesForEntity(EntityInfo info) {
+
+    Entity entity = info.entity;
     String line;
 
     // Entity name
@@ -167,12 +196,12 @@ public class HudRenderObject {
 
     // Full name
     if (shouldDisplayResourceName()) {
-      lines.add(format(Config.formatResourceName) + entityInfo.unlocalizedName);
+      lines.add(format(Config.formatResourceName) + info.unlocalizedName);
     }
 
     // Mod name
     if (shouldDisplayModName()) {
-      lines.add(format(Config.formatModName) + entityInfo.modName);
+      lines.add(format(Config.formatModName) + info.modName);
     }
   }
 

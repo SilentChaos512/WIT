@@ -6,19 +6,15 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -136,6 +132,13 @@ public class WIT {
             BlockStackInfo blockInfo = new BlockStackInfo(state, pos);
             if (blockInfo.block != Blocks.air && blockInfo.item != null) {
               renderObject = new HudRenderObject(blockInfo);
+            }
+          } else {
+            // Might be able to get item dropped by block?
+            Item itemDrop = state.getBlock().getItemDropped(state, world.rand, 0);
+            if (itemDrop != null) {
+              ItemStackInfo itemInfo = new ItemStackInfo(new ItemStack(itemDrop));
+              renderObject = new HudRenderObject(itemInfo);
             }
           }
         }
