@@ -74,7 +74,7 @@ public class HudRenderObject {
     int longestWidth = getWidth();
 
     // Render background
-    adjustBackgroundHeight(event, getHeight(), true);
+    adjustBackgroundHeight(event, getHeight() + 2 * BACKGROUND_PADDING, true);
     renderBackground(longestWidth, x, y);
 
     // Render text
@@ -90,7 +90,6 @@ public class HudRenderObject {
   public static void adjustBackgroundHeight(RenderGameOverlayEvent event, int maxHeight,
       boolean expand) {
 
-    // System.out.println(event.partialTicks);
     float time = event.partialTicks - lastPartialTicks;
     if (time < 0f) {
       time += 1f;
@@ -109,7 +108,6 @@ public class HudRenderObject {
         backgroundHeight = maxHeight;
       }
     }
-    // backgroundHeight = MathHelper.clamp_double(backgroundHeight, 0, maxHeight);
   }
 
   public static void renderBackground(int maxWidth, int posX, int posY) {
@@ -126,7 +124,7 @@ public class HudRenderObject {
     double x = posX - BACKGROUND_PADDING;
     double y = posY - BACKGROUND_PADDING + heightDifference / 2;
     double width = maxWidth + 2 * BACKGROUND_PADDING;
-    double height = backgroundHeight + 2 * BACKGROUND_PADDING;
+    double height = backgroundHeight;
 
     Minecraft.getMinecraft().renderEngine
         .bindTexture(new ResourceLocation(WIT.MOD_ID, "textures/background.png"));
