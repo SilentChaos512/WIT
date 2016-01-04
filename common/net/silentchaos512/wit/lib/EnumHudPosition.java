@@ -15,7 +15,7 @@ public enum EnumHudPosition {
     
     int screenWidth = Minecraft.getMinecraft().displayWidth;
     int screenHeight = Minecraft.getMinecraft().displayHeight;
-    ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft(), screenWidth, screenHeight);
+    ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
     screenWidth = res.getScaledWidth();
     screenHeight = res.getScaledHeight();
     int objectWidth = renderObject.getWidth();

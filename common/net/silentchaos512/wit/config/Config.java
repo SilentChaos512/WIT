@@ -22,18 +22,23 @@ public class Config {
    * HUD display options
    */
 
-  public static boolean hudDisplayResourceName = true;
-  public static String hudDisplayResourceNameComment = "Display the resource name in the HUD. Example: minecraft:stone.";
-  public static boolean hudDisplayResourceNameShift = true;
-  public static String hudDisplayResourceNameShiftComment = "Display the resource name only when sneaking.";
-  public static boolean hudDisplayModName = true;
-  public static String hudDisplayModNameComment = "Display the name of the mod in the HUD.";
-  public static boolean hudDisplayModNameShift = false;
-  public static String hudDisplayModNameShiftComment = "Display the name of the mod only when sneaking.";
-  public static boolean hudDisplayIdMeta = true;
-  public static String hudDisplayIdMetaComment = "Display the ID and metadata of the block next to its name.";
-  public static boolean hudDisplayIdMetaShift = true;
-  public static String hudDisplayIdMetaShiftComment = "Display the ID and metadata only when sneaking.";
+  //@formatter:off
+  public static ConfigOptionHudElement hudObjectName = new ConfigOptionHudElement(
+      "object_name", true, false, "&f")
+      .setComment("Display the block/entity name in the HUD. Example: Iron Ore, Chicken");
+  public static ConfigOptionHudElement hudResourceName = new ConfigOptionHudElement(
+      "resource_name", true, true, "&7")
+      .setComment("Display the resource name in the HUD. Example: minecraft:stone.");
+  public static ConfigOptionHudElement hudModName = new ConfigOptionHudElement(
+      "mod_name", true, false, "&e")
+      .setComment("Display the mod name in the HUD. Example: Minecraft");
+  public static ConfigOptionHudElement hudIdMeta = new ConfigOptionHudElement(
+      "id_and_meta", true, true, "&o")
+      .setComment("Display the ID and metadata in the HUD. Example: [1:0]");
+  public static ConfigOptionHudElement hudTileEntity = new ConfigOptionHudElement(
+      "tile_entity", true, false, "&7")
+      .setComment("Tells if a tile entity exists for the block being looked at. Example: Furnace (TE)");
+  //@formatter:on
 
   /*
    * Tooltip display options
@@ -97,18 +102,11 @@ public class Config {
        * HUD display options
        */
 
-      hudDisplayResourceName = c.getBoolean("ResourceName.Show", CAT_HUD_DISPLAY,
-          hudDisplayResourceName, hudDisplayResourceNameComment);
-      hudDisplayResourceNameShift = c.getBoolean("ResourceName.SneakingOnly", CAT_HUD_DISPLAY,
-          hudDisplayResourceNameShift, hudDisplayResourceNameShiftComment);
-      hudDisplayModName = c.getBoolean("ModName.Show", CAT_HUD_DISPLAY, hudDisplayModName,
-          hudDisplayModNameComment);
-      hudDisplayModNameShift = c.getBoolean("ModName.SneakingOnly", CAT_HUD_DISPLAY,
-          hudDisplayModNameShift, hudDisplayModNameShiftComment);
-      hudDisplayIdMeta = c.getBoolean("IDMeta.Show", CAT_HUD_DISPLAY, hudDisplayIdMeta,
-          hudDisplayIdMetaComment);
-      hudDisplayIdMetaShift = c.getBoolean("IDMeta.SneakingOnly", CAT_HUD_DISPLAY,
-          hudDisplayIdMetaShift, hudDisplayIdMetaShiftComment);
+      hudObjectName.loadValue(c);
+      hudResourceName.loadValue(c);
+      hudModName.loadValue(c);
+      hudIdMeta.loadValue(c);
+      hudTileEntity.loadValue(c);
 
       /*
        * Tooltip display options
@@ -120,8 +118,8 @@ public class Config {
           tooltipDisplayModNameShift, tooltipDisplayModNameShiftComment);
       tooltipDisplayOreDict = c.getBoolean("OreDictionary.Show", CAT_TOOLTIP, tooltipDisplayOreDict,
           tooltipDisplayOreDictComment);
-      tooltipDisplayOreDictShift = c.getBoolean("OreDictionary.ShiftOnly", CAT_TOOLTIP, tooltipDisplayOreDictShift,
-          tooltipDisplayOreDictShiftComment);
+      tooltipDisplayOreDictShift = c.getBoolean("OreDictionary.ShiftOnly", CAT_TOOLTIP,
+          tooltipDisplayOreDictShift, tooltipDisplayOreDictShiftComment);
 
       /*
        * Formatting

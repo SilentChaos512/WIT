@@ -50,7 +50,7 @@ public class ObjectInfo {
     }
 
     this.unlocalizedName = EntityList.getEntityString(entity);
-    this.localizedName = entity.getName();
+    this.localizedName = entity.getDisplayName().getFormattedText();
   }
 
   public ObjectInfo(Entity entity) {

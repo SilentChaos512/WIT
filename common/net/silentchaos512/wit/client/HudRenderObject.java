@@ -10,9 +10,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -20,38 +22,48 @@ import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
+import net.silentchaos512.wit.info.ItemStackInfo;
 
 public class HudRenderObject {
 
   public static final int VERTICAL_LINE_SPACING = 2;
   public static final int BACKGROUND_PADDING = 3;
-  public static final int BACKGROUND_TRANSITION_TIME = 16;
+  public static final int BACKGROUND_TRANSITION_TIME = 4;
 
   public static double backgroundHeight = 0.0;
   public static int lastMaxBackgroundWidth = 0;
   public static int lastMaxBackgroundHeight = 0;
   public static int lastBackgroundPosX = 0;
   public static int lastBackgroundPosY = 0;
+  public static float lastPartialTicks = 0f;
 
   BlockStackInfo blockInfo = null;
+  ItemStackInfo itemInfo = null;
   EntityInfo entityInfo = null;
 
   List<String> lines = Lists.newArrayList();
 
   Minecraft mc = Minecraft.getMinecraft();
+  EntityPlayer player = mc.thePlayer;
   FontRenderer fontRender = mc.fontRendererObj;
   boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
 
   public HudRenderObject(BlockStackInfo blockInfo) {
 
     this.blockInfo = blockInfo;
-    getLinesForBlock();
+    getLinesForBlock(blockInfo);
+  }
+
+  public HudRenderObject(ItemStackInfo itemInfo) {
+
+    this.itemInfo = itemInfo;
+    getLinesForItem(itemInfo);
   }
 
   public HudRenderObject(EntityInfo entityInfo) {
 
     this.entityInfo = entityInfo;
-    getLinesForEntity();
+    getLinesForEntity(entityInfo);
   }
 
   public void render(RenderGameOverlayEvent event) {
@@ -64,7 +76,7 @@ public class HudRenderObject {
     int longestWidth = getWidth();
 
     // Render background
-    adjustBackgroundHeight(event, getHeight(), true);
+    adjustBackgroundHeight(event, getHeight() + 2 * BACKGROUND_PADDING, true);
     renderBackground(longestWidth, x, y);
 
     // Render text
@@ -80,19 +92,24 @@ public class HudRenderObject {
   public static void adjustBackgroundHeight(RenderGameOverlayEvent event, int maxHeight,
       boolean expand) {
 
+    float time = event.partialTicks - lastPartialTicks;
+    if (time < 0f) {
+      time += 1f;
+    }
+    lastPartialTicks = event.partialTicks;
+
     lastMaxBackgroundHeight = maxHeight;
     if (backgroundHeight > maxHeight || !expand) {
-      backgroundHeight -= event.partialTicks * maxHeight / BACKGROUND_TRANSITION_TIME;
+      backgroundHeight -= time * maxHeight / BACKGROUND_TRANSITION_TIME;
       if (backgroundHeight < 0.0) {
         backgroundHeight = 0.0;
       }
     } else if (expand) {
-      backgroundHeight += event.partialTicks * maxHeight / BACKGROUND_TRANSITION_TIME;
+      backgroundHeight += time * maxHeight / BACKGROUND_TRANSITION_TIME;
       if (backgroundHeight > maxHeight) {
         backgroundHeight = maxHeight;
       }
     }
-    // backgroundHeight = MathHelper.clamp_double(backgroundHeight, 0, maxHeight);
   }
 
   public static void renderBackground(int maxWidth, int posX, int posY) {
@@ -109,7 +126,7 @@ public class HudRenderObject {
     double x = posX - BACKGROUND_PADDING;
     double y = posY - BACKGROUND_PADDING + heightDifference / 2;
     double width = maxWidth + 2 * BACKGROUND_PADDING;
-    double height = backgroundHeight + 2 * BACKGROUND_PADDING;
+    double height = backgroundHeight;
 
     Minecraft.getMinecraft().renderEngine
         .bindTexture(new ResourceLocation(WIT.MOD_ID, "textures/background.png"));
@@ -117,60 +134,80 @@ public class HudRenderObject {
 
     Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-    worldrenderer.startDrawingQuads();
-    worldrenderer.addVertexWithUV(x, y + height, 0, 0, 1);
-    worldrenderer.addVertexWithUV(x + width, y + height, 0, 1, 1);
-    worldrenderer.addVertexWithUV(x + width, y, 0, 1, 0);
-    worldrenderer.addVertexWithUV(x, y, 0, 0, 0);
+    worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    worldrenderer.pos(x, y + height, 0).tex(0, 1).endVertex();
+    worldrenderer.pos(x + width, y + height, 0).tex(1, 1).endVertex();
+    worldrenderer.pos(x + width, y, 0).tex(1, 0).endVertex();
+    worldrenderer.pos(x, y, 0).tex(0, 0).endVertex();
     tessellator.draw();
   }
 
-  public void getLinesForBlock() {
+  public void getLinesForBlock(BlockStackInfo info) {
 
     // Name, ID, meta, tile entity
-    String line = blockInfo.item.getRarity(blockInfo.stack).rarityColor + blockInfo.localizedName;
-    line += shouldDisplayIdMeta() ? " [" + blockInfo.blockId + ":" + blockInfo.meta + "]" : "";
-    if (blockInfo.tileEntity != null) {
-      line += EnumChatFormatting.GRAY + " (TE)";
+    String line = Config.hudObjectName.shouldDisplay(player)
+        ? info.item.getRarity(info.stack).rarityColor + info.localizedName : "";
+    line += Config.hudIdMeta.shouldDisplay(player)
+        ? Config.hudIdMeta.formatString(" [" + info.blockId + ":" + info.meta + "]") : "";
+    if (info.tileEntity != null && Config.hudTileEntity.shouldDisplay(player)) {
+      line += Config.hudTileEntity.formatString(" (TE)");
     }
     lines.add(line);
 
-    // Full name
-    if (shouldDisplayResourceName()) {
-      lines.add(format(Config.formatResourceName) + blockInfo.modId + ":"
-          + blockInfo.resourceLocation.getResourcePath());
+    // Full (resource) name
+    if (Config.hudResourceName.shouldDisplay(player)) {
+      lines.add(Config.hudResourceName
+          .formatString(info.modId + ":" + info.resourceLocation.getResourcePath()));
     }
 
     // Mod name
-    if (shouldDisplayModName()) {
-      lines.add(format(Config.formatModName) + blockInfo.modName);
+    if (Config.hudModName.shouldDisplay(player)) {
+      lines.add(Config.hudModName.formatString(info.modName));
     }
   }
 
-  public void getLinesForEntity() {
+  public void getLinesForItem(ItemStackInfo info) {
 
-    Entity entity = entityInfo.entity;
+    // Name, ID, meta, tile entity
+    String line = Config.hudObjectName.shouldDisplay(player)
+        ? info.item.getRarity(info.stack).rarityColor + info.localizedName : "";
+    line += Config.hudIdMeta.shouldDisplay(player) ? Config.hudIdMeta.formatString(
+        " [" + Item.getIdFromItem(info.item) + ":" + info.stack.getItemDamage() + "]") : "";
+    lines.add(line);
+
+    // Full (resource) name
+    if (Config.hudResourceName.shouldDisplay(player)) {
+      lines.add(Config.hudResourceName
+          .formatString(info.modId + ":" + info.resourceLocation.getResourcePath()));
+    }
+
+    // Mod name
+    if (Config.hudModName.shouldDisplay(player)) {
+      lines.add(Config.hudModName.formatString(info.modName));
+    }
+  }
+
+  public void getLinesForEntity(EntityInfo info) {
+
+    Entity entity = info.entity;
     String line;
 
     // Entity name
-    line = (entity.hasCustomName() ? EnumChatFormatting.ITALIC : "") + entity.getName();
-    line += shouldDisplayIdMeta() ? " [" + EntityList.getEntityID(entity) + "]" : "";
+    line = Config.hudObjectName.shouldDisplay(player) ? entity.getDisplayName().getFormattedText()
+        : "";
+    line += Config.hudIdMeta.shouldDisplay(player)
+        ? Config.hudIdMeta.formatString(" [" + EntityList.getEntityID(entity) + "]") : "";
     lines.add(line);
 
     // Full name
-    if (shouldDisplayResourceName()) {
-      lines.add(format(Config.formatResourceName) + entityInfo.unlocalizedName);
+    if (Config.hudResourceName.shouldDisplay(player)) {
+      lines.add(Config.hudResourceName.formatString(info.unlocalizedName));
     }
 
     // Mod name
-    if (shouldDisplayModName()) {
-      lines.add(format(Config.formatModName) + entityInfo.modName);
+    if (Config.hudModName.shouldDisplay(player)) {
+      lines.add(Config.hudModName.formatString(info.modName));
     }
-  }
-
-  public String format(String str) {
-
-    return str.replaceAll("&", "\u00a7");
   }
 
   public int getWidth() {
@@ -187,35 +224,5 @@ public class HudRenderObject {
   public int getHeight() {
 
     return fontRender.FONT_HEIGHT * lines.size() + VERTICAL_LINE_SPACING * (lines.size() - 1);
-  }
-
-  public boolean shouldDisplayResourceName() {
-
-    if (Config.hudDisplayResourceName) {
-      if ((Config.hudDisplayResourceNameShift && sneaking) || !Config.hudDisplayResourceNameShift) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean shouldDisplayModName() {
-
-    if (Config.hudDisplayModName) {
-      if ((Config.hudDisplayModNameShift && sneaking) || !Config.hudDisplayModNameShift) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean shouldDisplayIdMeta() {
-
-    if (Config.hudDisplayIdMeta) {
-      if ((Config.hudDisplayIdMetaShift && sneaking) || !Config.hudDisplayIdMetaShift) {
-        return true;
-      }
-    }
-    return false;
   }
 }
