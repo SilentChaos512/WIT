@@ -7,10 +7,10 @@ public class ConfigOptionHudElement extends ConfigOption {
 
   public static final String CATEGORY_HUD_DISPLAY = Config.CAT_HUD_DISPLAY;
 
-  public static final String KEY_SHOW_ELEMENT = "ShowElement";
-  public static final String KEY_SNEAK_ONLY = "WhenSneakingOnly";
-  public static final String KEY_FORMAT_1 = "FormatString1";
-  public static final String KEY_FORMAT_2 = "FormatString2";
+  public static final String KEY_SHOW_ELEMENT = "Show Element";
+  public static final String KEY_SNEAK_ONLY = "When Sneaking Only";
+  public static final String KEY_FORMAT_1 = "Format String 1";
+  public static final String KEY_FORMAT_2 = "Format String 2";
 
   public static final String COMMENT_SHOW_ELEMENT = "Set to false to never show this element.";
   public static final String COMMENT_SNEAK_ONLY = "Only show the element when the player is sneaking, assuming "

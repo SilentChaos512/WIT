@@ -28,24 +28,26 @@ public class Config {
 
   //@formatter:off
   public static ConfigOptionHudElement hudObjectName = new ConfigOptionHudElement(
-      "object_name", true, false, "&f")
+      "Object Name", true, false, "&f")
       .setComment("Display the block/entity name in the HUD. Example: Iron Ore, Chicken");
   public static ConfigOptionHudElement hudResourceName = new ConfigOptionHudElement(
-      "resource_name", true, true, "&7")
+      "Resource Name", true, true, "&7")
       .setComment("Display the resource name in the HUD. Example: minecraft:stone.");
   public static ConfigOptionHudElement hudModName = new ConfigOptionHudElement(
-      "mod_name", true, false, "&e")
+      "Mod Name", true, false, "&e")
       .setComment("Display the mod name in the HUD. Example: Minecraft");
   public static ConfigOptionHudElement hudIdMeta = new ConfigOptionHudElement(
-      "id_and_meta", true, true, "&o")
+      "ID and Meta", true, true, "&o")
       .setComment("Display the ID and metadata in the HUD. Example: [1:0]");
   public static ConfigOptionHudElement hudTileEntity = new ConfigOptionHudElement(
-      "tile_entity", true, false, "&7")
+      "Tile Entity", true, false, "&7")
       .setComment("Tells if a tile entity exists for the block being looked at. Example: Furnace (TE)");
   public static ConfigOptionHudElement hudHarvestable = new ConfigOptionHudElement(
-      "harvestability", true, true, "&a", "&c")
+      "Harvestability", true, true, "&a", "&c")
       .setComment("Shows whether or not a block is harvestable and with what kind of tool.");
   //@formatter:on
+
+  public static float hudBackgroundOpacity = 0.8f;
 
   /*
    * Tooltip display options
@@ -72,11 +74,11 @@ public class Config {
 
   static final String splitter = Configuration.CATEGORY_SPLITTER;
   public static final String CAT_MAIN = "main";
-  public static final String CAT_HUD = CAT_MAIN + splitter + "hud";
-  public static final String CAT_HUD_DISPLAY = CAT_HUD + splitter + "display";
-  public static final String CAT_HUD_POSITION = CAT_HUD + splitter + "positioning";
-  public static final String CAT_TOOLTIP = CAT_MAIN + splitter + "tooltip";
-  public static final String CAT_TOOLTIP_FORMAT = CAT_TOOLTIP + splitter + "formatting";
+  public static final String CAT_HUD = CAT_MAIN + splitter + "HUD";
+  public static final String CAT_HUD_DISPLAY = CAT_HUD + splitter + "Display";
+  public static final String CAT_HUD_POSITION = CAT_HUD + splitter + "Positioning";
+  public static final String CAT_TOOLTIP = CAT_MAIN + splitter + "Tooltip";
+  public static final String CAT_TOOLTIP_FORMAT = CAT_TOOLTIP + splitter + "Formatting";
 
   private static File configFile;
   private static Configuration c;
@@ -84,21 +86,21 @@ public class Config {
   public static void init(File file) {
 
     configFile = file;
-    c = new Configuration(file);
+    c = new Configuration(file, true);
     load();
   }
 
   public static void load() {
 
     try {
-      //c.load();
+      // c.load();
       String str;
 
       /*
        * HUD display positioning
        */
 
-      str = c.getString("TextJustification", CAT_HUD_POSITION, "CENTER", hudJustificationComment,
+      str = c.getString("Text Justification", CAT_HUD_POSITION, "CENTER", hudJustificationComment,
           EnumJustification.getValidValues());
       for (EnumJustification j : EnumJustification.values()) {
         if (str.equals(j.name())) {
@@ -125,26 +127,29 @@ public class Config {
       hudTileEntity.loadValue(c);
       hudHarvestable.loadValue(c);
 
+      hudBackgroundOpacity = c.getFloat("Background Opacity", CAT_HUD_DISPLAY, hudBackgroundOpacity,
+          0f, 1f, "Opacity (alpha) of the HUD background image.");
+
       /*
        * Tooltip display options
        */
 
-      tooltipDisplayModName = c.getBoolean("ModName.Show", CAT_TOOLTIP, tooltipDisplayModName,
+      tooltipDisplayModName = c.getBoolean("Mod Name - Show", CAT_TOOLTIP, tooltipDisplayModName,
           tooltipDisplayModNameComment);
-      tooltipDisplayModNameShift = c.getBoolean("ModName.ShiftOnly", CAT_TOOLTIP,
+      tooltipDisplayModNameShift = c.getBoolean("Mod Name - Sneak Only", CAT_TOOLTIP,
           tooltipDisplayModNameShift, tooltipDisplayModNameShiftComment);
-      tooltipDisplayOreDict = c.getBoolean("OreDictionary.Show", CAT_TOOLTIP, tooltipDisplayOreDict,
+      tooltipDisplayOreDict = c.getBoolean("Ore Dictionary - Show", CAT_TOOLTIP, tooltipDisplayOreDict,
           tooltipDisplayOreDictComment);
-      tooltipDisplayOreDictShift = c.getBoolean("OreDictionary.ShiftOnly", CAT_TOOLTIP,
+      tooltipDisplayOreDictShift = c.getBoolean("Ore Dictionary - Sneak Only", CAT_TOOLTIP,
           tooltipDisplayOreDictShift, tooltipDisplayOreDictShiftComment);
 
       /*
        * Formatting
        */
 
-      formatModName = c.getString("ModName", CAT_TOOLTIP_FORMAT, formatModName,
+      formatModName = c.getString("Mod Name", CAT_TOOLTIP_FORMAT, formatModName,
           formatModNameComment);
-      formatResourceName = c.getString("ResourceName", CAT_TOOLTIP_FORMAT, formatResourceName,
+      formatResourceName = c.getString("Resource Name", CAT_TOOLTIP_FORMAT, formatResourceName,
           formatResourceNameComment);
     } catch (Exception e) {
       System.out.println("Oh noes!!! Couldn't load configuration file properly!");

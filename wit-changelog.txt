@@ -1,5 +1,5 @@
 1.0.1
-Delete your config file!
+Delete your config file for best results. The entire config file structure has changed.
 
 Added: A config GUI! Configure WIT in-game through the Mods/Mod Options menu!
-Added: Harvestability info.
+Added: Harvestability info. Still needs work, but it accurately tells whether or not you can harvest a block (just not with which tool in many cases).

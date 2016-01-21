@@ -137,7 +137,7 @@ public class HudRenderObject {
 
     Minecraft.getMinecraft().renderEngine
         .bindTexture(new ResourceLocation(WIT.MOD_ID, "textures/background.png"));
-    GL11.glColor4f(1f, 1f, 1f, 0.8f); // TODO: Configs?
+    GL11.glColor4f(1f, 1f, 1f, Config.hudBackgroundOpacity);
 
     Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer worldrenderer = tessellator.getWorldRenderer();
