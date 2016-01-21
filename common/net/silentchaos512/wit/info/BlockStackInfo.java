@@ -11,19 +11,25 @@ public class BlockStackInfo extends ItemStackInfo {
 
   // Block
   public final IBlockState state;
+  public final BlockPos pos;
   public final Block block;
   public final int blockId;
   public final int meta;
   public final TileEntity tileEntity;
+  public final String harvestTool;
+  public final int harvestLevel;
 
   public BlockStackInfo(IBlockState state, BlockPos pos) {
 
     super(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
 
     this.state = state;
+    this.pos = pos;
     block = state.getBlock();
     blockId = block.getIdFromBlock(block);
     meta = block.getMetaFromState(state);
     tileEntity = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos);
+    harvestTool = block.getHarvestTool(state);
+    harvestLevel = block.getHarvestLevel(state);
   }
 }

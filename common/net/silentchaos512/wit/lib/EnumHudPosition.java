@@ -43,4 +43,13 @@ public enum EnumHudPosition {
         return new Tuple(0, 0);
     }
   }
+
+  public static String[] getValidValues() {
+
+    String[] result = new String[values().length];
+    for (int i = 0; i < values().length; ++i) {
+      result[i] = values()[i].name();
+    }
+    return result;
+  }
 }

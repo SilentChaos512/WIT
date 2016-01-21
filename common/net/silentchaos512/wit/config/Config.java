@@ -1,8 +1,12 @@
 package net.silentchaos512.wit.config;
 
 import java.io.File;
+import java.util.List;
 
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.client.config.IConfigElement;
 import net.silentchaos512.wit.lib.EnumHudPosition;
 import net.silentchaos512.wit.lib.EnumJustification;
 
@@ -38,6 +42,9 @@ public class Config {
   public static ConfigOptionHudElement hudTileEntity = new ConfigOptionHudElement(
       "tile_entity", true, false, "&7")
       .setComment("Tells if a tile entity exists for the block being looked at. Example: Furnace (TE)");
+  public static ConfigOptionHudElement hudHarvestable = new ConfigOptionHudElement(
+      "harvestability", true, true, "&a", "&c")
+      .setComment("Shows whether or not a block is harvestable and with what kind of tool.");
   //@formatter:on
 
   /*
@@ -64,34 +71,43 @@ public class Config {
   public static String formatResourceNameComment = "Formatting for resource names.";
 
   static final String splitter = Configuration.CATEGORY_SPLITTER;
-  public static final String CAT_HUD = "hud";
+  public static final String CAT_MAIN = "main";
+  public static final String CAT_HUD = CAT_MAIN + splitter + "hud";
   public static final String CAT_HUD_DISPLAY = CAT_HUD + splitter + "display";
   public static final String CAT_HUD_POSITION = CAT_HUD + splitter + "positioning";
-  public static final String CAT_TOOLTIP = "tooltip";
+  public static final String CAT_TOOLTIP = CAT_MAIN + splitter + "tooltip";
   public static final String CAT_TOOLTIP_FORMAT = CAT_TOOLTIP + splitter + "formatting";
 
+  private static File configFile;
   private static Configuration c;
 
   public static void init(File file) {
 
+    configFile = file;
     c = new Configuration(file);
+    load();
+  }
+
+  public static void load() {
 
     try {
-      c.load();
+      //c.load();
       String str;
 
       /*
        * HUD display positioning
        */
 
-      str = c.getString("TextJustification", CAT_HUD_POSITION, "CENTER", hudJustificationComment);
+      str = c.getString("TextJustification", CAT_HUD_POSITION, "CENTER", hudJustificationComment,
+          EnumJustification.getValidValues());
       for (EnumJustification j : EnumJustification.values()) {
         if (str.equals(j.name())) {
           hudJustification = j;
         }
       }
 
-      str = c.getString("Position", CAT_HUD_POSITION, "TOP_CENTER", hudPositionComment);
+      str = c.getString("Position", CAT_HUD_POSITION, "TOP_CENTER", hudPositionComment,
+          EnumHudPosition.getValidValues());
       for (EnumHudPosition p : EnumHudPosition.values()) {
         if (str.equals(p.name())) {
           hudPosition = p;
@@ -107,6 +123,7 @@ public class Config {
       hudModName.loadValue(c);
       hudIdMeta.loadValue(c);
       hudTileEntity.loadValue(c);
+      hudHarvestable.loadValue(c);
 
       /*
        * Tooltip display options
@@ -140,5 +157,20 @@ public class Config {
     if (c.hasChanged()) {
       c.save();
     }
+  }
+
+  public static ConfigCategory getCategory(String str) {
+
+    return c.getCategory(str);
+  }
+
+  public static Configuration getConfiguration() {
+
+    return c;
+  }
+
+  public static List<IConfigElement> getConfigElements() {
+
+    return new ConfigElement(getCategory(CAT_MAIN)).getChildElements();
   }
 }

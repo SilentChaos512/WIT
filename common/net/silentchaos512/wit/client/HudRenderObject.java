@@ -11,18 +11,23 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.stream.ChatController.EnumChannelState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.ForgeVersion;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
 import net.silentchaos512.wit.info.ItemStackInfo;
+import net.silentchaos512.wit.lib.LocalizationHelper;
 
 public class HudRenderObject {
 
@@ -40,6 +45,8 @@ public class HudRenderObject {
   BlockStackInfo blockInfo = null;
   ItemStackInfo itemInfo = null;
   EntityInfo entityInfo = null;
+
+  LocalizationHelper loc = LocalizationHelper.instance;
 
   List<String> lines = Lists.newArrayList();
 
@@ -153,6 +160,23 @@ public class HudRenderObject {
       line += Config.hudTileEntity.formatString(" (TE)");
     }
     lines.add(line);
+
+    // Harvestability
+    if (Config.hudHarvestable.shouldDisplay(player)) {
+      boolean canHarvest = ForgeHooks.canHarvestBlock(info.block, player, player.worldObj,
+          info.pos) && info.block.getBlockHardness(player.worldObj, info.pos) >= 0;
+      String format = canHarvest ? Config.hudHarvestable.formatString("")
+          : Config.hudHarvestable.formatString2("");
+
+      if (info.harvestTool != null && info.harvestLevel > -1) {
+        line = loc.get("HarvestWith");
+        String tool = loc.get("Tool." + info.harvestTool);
+        line = String.format(line, tool, info.harvestLevel);
+      } else {
+        line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
+      }
+      lines.add(format + line);
+    }
 
     // Full (resource) name
     if (Config.hudResourceName.shouldDisplay(player)) {

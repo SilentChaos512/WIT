@@ -1,0 +1,5 @@
+1.0.1
+Delete your config file!
+
+Added: A config GUI! Configure WIT in-game through the Mods/Mod Options menu!
+Added: Harvestability info.

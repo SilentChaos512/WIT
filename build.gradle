@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //    id "net.minecraftforge.gradle.forge" version "2.0.2"
 //}
 
-version = "1.0.0"
+version = "1.0.1"
 group= "net.silentchaos512.wit" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "WIT-1.8.9"
 
@@ -58,5 +58,11 @@ processResources
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+}
+
+jar {
+    manifest {
+        attributes 'ModSide': 'CLIENT'
     }
 }

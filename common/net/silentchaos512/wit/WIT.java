@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -35,9 +36,10 @@ import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
 import net.silentchaos512.wit.info.ItemStackInfo;
+import net.silentchaos512.wit.lib.LocalizationHelper;
 import net.silentchaos512.wit.proxy.CommonProxy;
 
-@Mod(modid = WIT.MOD_ID, name = WIT.MOD_NAME, version = WIT.VERSION_NUMBER)
+@Mod(modid = WIT.MOD_ID, name = WIT.MOD_NAME, version = WIT.VERSION_NUMBER, guiFactory = "net.silentchaos512.wit.gui.GuiFactoryWit")
 public class WIT {
 
   public static final String MOD_ID = "WIT";
@@ -72,6 +74,7 @@ public class WIT {
   public void init(FMLInitializationEvent event) {
 
     proxy.init();
+    LocalizationHelper.init();
     Config.save();
   }
 
@@ -79,6 +82,15 @@ public class WIT {
   public void postInit(FMLPostInitializationEvent event) {
 
     proxy.postInit();
+  }
+
+  @SubscribeEvent
+  public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+
+    if (event.modID.equals(MOD_ID)) {
+      Config.load();
+      Config.save();
+    }
   }
 
   @SubscribeEvent
