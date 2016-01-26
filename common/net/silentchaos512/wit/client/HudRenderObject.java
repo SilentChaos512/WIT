@@ -163,8 +163,9 @@ public class HudRenderObject {
 
     // Harvestability
     if (Config.hudHarvestable.shouldDisplay(player)) {
-      boolean canHarvest = ForgeHooks.canHarvestBlock(info.block, player, player.worldObj,
-          info.pos) && info.block.getBlockHardness(player.worldObj, info.pos) >= 0;
+      boolean canHarvest = info.meta >= 0 && info.meta < 16 // Bad metadata check
+          && ForgeHooks.canHarvestBlock(info.block, player, player.worldObj, info.pos)
+          && info.block.getBlockHardness(player.worldObj, info.pos) >= 0;
       String format = canHarvest ? Config.hudHarvestable.formatString("")
           : Config.hudHarvestable.formatString2("");
 

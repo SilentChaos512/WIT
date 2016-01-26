@@ -29,7 +29,8 @@ public class BlockStackInfo extends ItemStackInfo {
     blockId = block.getIdFromBlock(block);
     meta = block.getMetaFromState(state);
     tileEntity = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos);
-    harvestTool = block.getHarvestTool(state);
-    harvestLevel = block.getHarvestLevel(state);
+    boolean metaIsGood = meta >= 0 && meta < 16;
+    harvestTool = metaIsGood ? block.getHarvestTool(state) : "null";
+    harvestLevel = metaIsGood ? block.getHarvestLevel(state) : -1;
   }
 }
