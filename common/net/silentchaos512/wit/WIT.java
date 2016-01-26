@@ -39,7 +39,14 @@ import net.silentchaos512.wit.info.ItemStackInfo;
 import net.silentchaos512.wit.lib.LocalizationHelper;
 import net.silentchaos512.wit.proxy.CommonProxy;
 
-@Mod(modid = WIT.MOD_ID, name = WIT.MOD_NAME, version = WIT.VERSION_NUMBER, guiFactory = "net.silentchaos512.wit.gui.GuiFactoryWit")
+//@formatter:off
+@Mod(modid = WIT.MOD_ID,
+    name = WIT.MOD_NAME,
+    version = WIT.VERSION_NUMBER,
+    clientSideOnly = true,
+    guiFactory = "net.silentchaos512.wit.gui.GuiFactoryWit",
+    updateJSON = "https://raw.githubusercontent.com/SilentChaos512/WIT/master/update.json")
+//@formatter:on
 public class WIT {
 
   public static final String MOD_ID = "WIT";
