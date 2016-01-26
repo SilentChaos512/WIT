@@ -35,6 +35,7 @@ public class HudRenderObject {
   public static final int BACKGROUND_PADDING = 3;
   public static final int BACKGROUND_TRANSITION_TIME = 4;
 
+  public static boolean renderHud = true;
   public static double backgroundHeight = 0.0;
   public static int lastMaxBackgroundWidth = 0;
   public static int lastMaxBackgroundHeight = 0;
@@ -74,6 +75,10 @@ public class HudRenderObject {
   }
 
   public void render(RenderGameOverlayEvent event) {
+
+    if (!renderHud) {
+      return;
+    }
 
     Tuple position = Config.hudPosition.getStartingPosition(this);
     int x = (Integer) position.getFirst();
@@ -121,7 +126,7 @@ public class HudRenderObject {
 
   public static void renderBackground(int maxWidth, int posX, int posY) {
 
-    if (backgroundHeight <= 0.0) {
+    if (!renderHud || backgroundHeight <= 0.0) {
       return;
     }
 

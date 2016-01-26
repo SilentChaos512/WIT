@@ -61,7 +61,7 @@ public class WIT {
   @Instance(MOD_ID)
   public static WIT instance;
 
-  @SidedProxy(clientSide = "net.silentchaos512.wit.proxy.ClientProxy", serverSide = "net.silentchaos512.wit.proxy.CommonProxy")
+  @SidedProxy(clientSide = "net.silentchaos512.wit.proxy.ClientProxy")
   public static CommonProxy proxy;
 
   @EventHandler

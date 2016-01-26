@@ -1,3 +1,9 @@
+1.0.3
+Fixed: Crash when opening controls menu (oops)
+Added: Key binding to toggle HUD.
+
+1.0.2
+
 1.0.1
 Delete your config file for best results. The entire config file structure has changed.
 
