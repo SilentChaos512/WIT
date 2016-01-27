@@ -23,6 +23,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.ForgeVersion;
 import net.silentchaos512.wit.WIT;
+import net.silentchaos512.wit.api.IWitHudInfo;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
@@ -188,6 +189,15 @@ public class HudRenderObject {
     if (Config.hudResourceName.shouldDisplay(player)) {
       lines.add(Config.hudResourceName
           .formatString(info.modId + ":" + info.resourceLocation.getResourcePath()));
+    }
+
+    // Block specific info?
+    if (info.block instanceof IWitHudInfo) {
+      List<String> extraList = ((IWitHudInfo) info.block).getWitLines(info.state, info.pos, player,
+          false);
+      if (extraList != null) {
+        lines.addAll(extraList);
+      }
     }
 
     // Mod name
