@@ -194,7 +194,7 @@ public class HudRenderObject {
     // Block specific info?
     if (info.block instanceof IWitHudInfo) {
       List<String> extraList = ((IWitHudInfo) info.block).getWitLines(info.state, info.pos, player,
-          false);
+          Config.hudAdvancedMode);
       if (extraList != null) {
         lines.addAll(extraList);
       }

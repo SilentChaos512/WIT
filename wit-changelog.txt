@@ -1,3 +1,6 @@
+1.0.4
+Added: Other mods can now add info to the HUD
+
 1.0.3
 Fixed: Crash when opening controls menu (oops)
 Added: Key binding to toggle HUD.

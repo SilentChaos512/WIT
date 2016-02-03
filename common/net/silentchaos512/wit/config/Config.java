@@ -48,6 +48,7 @@ public class Config {
   //@formatter:on
 
   public static float hudBackgroundOpacity = 0.8f;
+  public static boolean hudAdvancedMode = false;
 
   /*
    * Tooltip display options
@@ -97,6 +98,13 @@ public class Config {
       String str;
 
       /*
+       * HUD
+       */
+
+      hudAdvancedMode = c.getBoolean("Advanced Mode", CAT_HUD, hudAdvancedMode,
+          "Display additional information in HUD that may not be especially useful to most players.");
+
+      /*
        * HUD display positioning
        */
 
@@ -138,8 +146,8 @@ public class Config {
           tooltipDisplayModNameComment);
       tooltipDisplayModNameShift = c.getBoolean("Mod Name - Sneak Only", CAT_TOOLTIP,
           tooltipDisplayModNameShift, tooltipDisplayModNameShiftComment);
-      tooltipDisplayOreDict = c.getBoolean("Ore Dictionary - Show", CAT_TOOLTIP, tooltipDisplayOreDict,
-          tooltipDisplayOreDictComment);
+      tooltipDisplayOreDict = c.getBoolean("Ore Dictionary - Show", CAT_TOOLTIP,
+          tooltipDisplayOreDict, tooltipDisplayOreDictComment);
       tooltipDisplayOreDictShift = c.getBoolean("Ore Dictionary - Sneak Only", CAT_TOOLTIP,
           tooltipDisplayOreDictShift, tooltipDisplayOreDictShiftComment);
 
