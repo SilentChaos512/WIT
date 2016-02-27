@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -19,7 +20,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -269,8 +269,9 @@ public class HudRenderObject {
       return;
     }
 
+    Block actualBlock = player.worldObj.getBlockState(info.pos).getBlock();
     boolean canHarvest = info.meta >= 0 && info.meta < 16 // Bad metadata check
-        && ForgeHooks.canHarvestBlock(info.block, player, player.worldObj, info.pos)
+        && ForgeHooks.canHarvestBlock(actualBlock, player, player.worldObj, info.pos)
         && info.block.getBlockHardness(player.worldObj, info.pos) >= 0;
     String format = canHarvest ? Config.hudHarvestable.formatString("")
         : Config.hudHarvestable.formatString2("");

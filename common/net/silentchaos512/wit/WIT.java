@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.client.HudRenderObject;
 import net.silentchaos512.wit.client.key.KeyTracker;
 import net.silentchaos512.wit.config.Config;
@@ -77,6 +78,8 @@ public class WIT {
     for (String key : Loader.instance().getIndexedModList().keySet()) {
       mods.put(key.toLowerCase(), Loader.instance().getIndexedModList().get(key));
     }
+
+    populateBlockReplacements();
   }
 
   @EventHandler
@@ -174,6 +177,18 @@ public class WIT {
       HudRenderObject.renderBackground(HudRenderObject.lastMaxBackgroundWidth,
           HudRenderObject.lastBackgroundPosX, HudRenderObject.lastBackgroundPosY);
     }
+  }
+
+  public void populateBlockReplacements() {
+
+    WitBlockReplacements.init();
+    WitBlockReplacements rep = WitBlockReplacements.instance;
+    rep.add(new ItemStack(Blocks.monster_egg, 1, 0), new ItemStack(Blocks.stone));
+    rep.add(new ItemStack(Blocks.monster_egg, 1, 1), new ItemStack(Blocks.cobblestone));
+    rep.add(new ItemStack(Blocks.monster_egg, 1, 2), new ItemStack(Blocks.stonebrick, 1, 0));
+    rep.add(new ItemStack(Blocks.monster_egg, 1, 3), new ItemStack(Blocks.stonebrick, 1, 1));
+    rep.add(new ItemStack(Blocks.monster_egg, 1, 4), new ItemStack(Blocks.stonebrick, 1, 2));
+    rep.add(new ItemStack(Blocks.monster_egg, 1, 5), new ItemStack(Blocks.stonebrick, 1, 3));
   }
 
   public boolean shouldDisplayModName() {

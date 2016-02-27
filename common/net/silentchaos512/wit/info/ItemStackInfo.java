@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.oredict.OreDictionary;
 import net.silentchaos512.wit.WIT;
+import net.silentchaos512.wit.api.WitBlockReplacements;
 
 public class ItemStackInfo extends ObjectInfo {
 
@@ -26,10 +27,10 @@ public class ItemStackInfo extends ObjectInfo {
 
   public ItemStackInfo(ItemStack stack) {
 
-    super(stack);
+    super(WitBlockReplacements.instance.get(stack));
 
-    this.stack = stack;
-    item = stack.getItem();
+    this.stack = WitBlockReplacements.instance.get(stack);
+    item = this.stack.getItem();
 
     if (item != null) {
       resourceLocation = (ResourceLocation) GameData.getItemRegistry().getNameForObject(item);

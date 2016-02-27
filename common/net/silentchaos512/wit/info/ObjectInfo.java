@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
 import net.minecraftforge.fml.common.registry.GameData;
 import net.silentchaos512.wit.WIT;
+import net.silentchaos512.wit.api.WitBlockReplacements;
 
 public class ObjectInfo {
 
@@ -60,7 +61,7 @@ public class ObjectInfo {
 
   public ObjectInfo(ItemStack stack) {
 
-    this(getModFromItem(stack.getItem()), stack.getItem().getUnlocalizedName(stack));
+    this(getModFromItem(stack), stack.getItem().getUnlocalizedName(stack));
   }
 
   public static ModContainer getModFromEntity(Entity entity) {
@@ -77,8 +78,9 @@ public class ObjectInfo {
     return null;
   }
 
-  public static ModContainer getModFromItem(Item item) {
+  public static ModContainer getModFromItem(ItemStack stack) {
 
+    Item item = stack.getItem();
     if (item == null) {
       return null;
     }

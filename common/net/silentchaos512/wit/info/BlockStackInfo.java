@@ -23,14 +23,18 @@ public class BlockStackInfo extends ItemStackInfo {
 
     super(new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
 
-    this.state = state;
+    Block newBlock = Block.getBlockFromItem(item);
+    meta = stack.getItemDamage();
+    IBlockState newState = newBlock.getStateFromMeta(meta);
+
+    this.state = newState;
     this.pos = pos;
-    block = state.getBlock();
+    block = newBlock;
     blockId = block.getIdFromBlock(block);
-    meta = block.getMetaFromState(state);
+//    meta = block.getMetaFromState(state);
     tileEntity = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos);
     boolean metaIsGood = meta >= 0 && meta < 16;
-    harvestTool = metaIsGood ? block.getHarvestTool(state) : "null";
-    harvestLevel = metaIsGood ? block.getHarvestLevel(state) : -1;
+    harvestTool = metaIsGood ? block.getHarvestTool(newState) : "null";
+    harvestLevel = metaIsGood ? block.getHarvestLevel(newState) : -1;
   }
 }
