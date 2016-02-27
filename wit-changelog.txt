@@ -1,4 +1,7 @@
 1.0.7
+Added: Monster spawners now display the name of what they spawn.
+Changed: Monster egg blocks are now hidden.
+Added (API): WitBlockReplacements. Use it to substitute one block with another in the HUD.
 Added (API): WitBlockInfoEvent. Allows mods to add lines to the HUD for any block.
 Added (API): WitEntityInfoEvent. Same as above, but for entities.
 

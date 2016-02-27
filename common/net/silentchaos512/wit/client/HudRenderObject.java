@@ -20,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -177,6 +178,8 @@ public class HudRenderObject {
 
     // Inventory?
     getLinesForBlockInventory(info, isIInventory, isIWitHudInfo);
+    // Mob spawner?
+    getLinesForMobSpawner(info);
     // Harvestability
     getLinesForBlockHarvestability(info);
 
@@ -246,6 +249,18 @@ public class HudRenderObject {
       if (omittedCount > 0) {
         String str2 = LocalizationHelper.instance.get("OmittedInventoryItems");
         lines.add(String.format(str2, omittedCount));
+      }
+    }
+  }
+
+  public void getLinesForMobSpawner(BlockStackInfo info) {
+
+    if (info.tileEntity instanceof TileEntityMobSpawner) {
+      TileEntityMobSpawner tile = (TileEntityMobSpawner) info.tileEntity;
+      Entity entity = tile.getSpawnerBaseLogic().func_180612_a(player.worldObj);
+      if (entity != null) {
+        EntityInfo entityInfo = new EntityInfo(entity);
+        lines.add(entityInfo.localizedName);
       }
     }
   }
