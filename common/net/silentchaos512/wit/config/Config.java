@@ -45,10 +45,14 @@ public class Config {
   public static ConfigOptionHudElement hudHarvestable = new ConfigOptionHudElement(
       "Harvestability", true, true, "&a", "&c")
       .setComment("Shows whether or not a block is harvestable and with what kind of tool.");
+  public static ConfigOptionHudElement hudBlockInventory = new ConfigOptionHudElement(
+      "Inventory Contents", true, false, "&f")
+      .setComment("Displays the contents of certain inventories, including item count.");
   //@formatter:on
 
   public static float hudBackgroundOpacity = 0.8f;
   public static boolean hudAdvancedMode = false;
+  public static int hudInventoryMaxListCount = 8;
 
   /*
    * Tooltip display options
@@ -134,9 +138,13 @@ public class Config {
       hudIdMeta.loadValue(c);
       hudTileEntity.loadValue(c);
       hudHarvestable.loadValue(c);
+      hudBlockInventory.loadValue(c);
 
       hudBackgroundOpacity = c.getFloat("Background Opacity", CAT_HUD_DISPLAY, hudBackgroundOpacity,
           0f, 1f, "Opacity (alpha) of the HUD background image.");
+      hudInventoryMaxListCount = c.getInt("Max Inventory List Count", CAT_HUD_DISPLAY,
+          hudInventoryMaxListCount, 0, 64,
+          "The maximum number of items to display for inventory contents.");
 
       /*
        * Tooltip display options

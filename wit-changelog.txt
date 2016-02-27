@@ -1,3 +1,13 @@
+1.0.7
+Added (API): WitBlockInfoEvent. Allows mods to add lines to the HUD for any block.
+Added (API): WitEntityInfoEvent. Same as above, but for entities.
+
+1.0.6
+Added: HUD now displays the contents of some inventories (includes special support for Storage Drawers!)
+
+1.0.5
+Added: Advanced mode config. Can be temporarily toggled with a keybinding. Mods can choose to display certain information only in advanced mode, for example.
+
 1.0.4
 Added: Other mods can now add info to the HUD
 

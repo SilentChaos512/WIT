@@ -58,6 +58,8 @@ public class WIT {
   public Map<String, ModContainer> mods;
   float lastPartialTicks = 0f;
 
+  public boolean foundStorageDrawers = false;
+
   @Instance(MOD_ID)
   public static WIT instance;
 
@@ -89,6 +91,7 @@ public class WIT {
   public void postInit(FMLPostInitializationEvent event) {
 
     proxy.postInit();
+    foundStorageDrawers = Loader.isModLoaded("StorageDrawers");
   }
 
   @SubscribeEvent

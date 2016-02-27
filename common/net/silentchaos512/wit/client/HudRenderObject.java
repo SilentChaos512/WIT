@@ -5,25 +5,30 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.stream.ChatController.EnumChannelState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.ForgeVersion;
+import net.minecraftforge.common.MinecraftForge;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.api.IWitHudInfo;
+import net.silentchaos512.wit.api.WitBlockInfoEvent;
+import net.silentchaos512.wit.api.WitEntityInfoEvent;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
@@ -157,6 +162,9 @@ public class HudRenderObject {
 
   public void getLinesForBlock(BlockStackInfo info) {
 
+    boolean isIInventory = info.tileEntity instanceof IInventory;
+    boolean isIWitHudInfo = info.block instanceof IWitHudInfo;
+
     // Name, ID, meta, tile entity
     String line = Config.hudObjectName.shouldDisplay(player)
         ? info.item.getRarity(info.stack).rarityColor + info.localizedName : "";
@@ -167,23 +175,10 @@ public class HudRenderObject {
     }
     lines.add(line);
 
+    // Inventory?
+    getLinesForBlockInventory(info, isIInventory, isIWitHudInfo);
     // Harvestability
-    if (Config.hudHarvestable.shouldDisplay(player)) {
-      boolean canHarvest = info.meta >= 0 && info.meta < 16 // Bad metadata check
-          && ForgeHooks.canHarvestBlock(info.block, player, player.worldObj, info.pos)
-          && info.block.getBlockHardness(player.worldObj, info.pos) >= 0;
-      String format = canHarvest ? Config.hudHarvestable.formatString("")
-          : Config.hudHarvestable.formatString2("");
-
-      if (info.harvestTool != null && info.harvestLevel > -1) {
-        line = loc.get("HarvestWith");
-        String tool = loc.get("Tool." + info.harvestTool);
-        line = String.format(line, tool, info.harvestLevel);
-      } else {
-        line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
-      }
-      lines.add(format + line);
-    }
+    getLinesForBlockHarvestability(info);
 
     // Full (resource) name
     if (Config.hudResourceName.shouldDisplay(player)) {
@@ -192,7 +187,7 @@ public class HudRenderObject {
     }
 
     // Block specific info?
-    if (info.block instanceof IWitHudInfo) {
+    if (isIWitHudInfo) {
       List<String> extraList = ((IWitHudInfo) info.block).getWitLines(info.state, info.pos, player,
           Config.hudAdvancedMode);
       if (extraList != null) {
@@ -200,10 +195,95 @@ public class HudRenderObject {
       }
     }
 
+    // WIT HUD info event
+    WitBlockInfoEvent event = new WitBlockInfoEvent(player, Config.hudAdvancedMode, info.pos,
+        info.state);
+    if (!MinecraftForge.EVENT_BUS.post(event)) {
+      lines.addAll(event.lines);
+    }
+
     // Mod name
     if (Config.hudModName.shouldDisplay(player)) {
       lines.add(Config.hudModName.formatString(info.modName));
     }
+  }
+
+  public void getLinesForBlockInventory(BlockStackInfo info, boolean isIInventory,
+      boolean isIWitHudInfo) {
+
+    if (!Config.hudBlockInventory.shouldDisplay(player)) {
+      return;
+    }
+
+    String str = "%s (%d)";
+
+    // Storage Drawers?
+    if (WIT.instance.foundStorageDrawers && info.tileEntity instanceof IDrawerGroup) {
+      IDrawerGroup drawers = (IDrawerGroup) info.tileEntity;
+      for (int i = 0; i < drawers.getDrawerCount(); ++i) {
+        IDrawer d = drawers.getDrawer(i);
+        if (d != null && d.getStoredItemPrototype() != null) {
+          int count = d.getStoredItemCount();
+          String name = d.getStoredItemPrototype().getDisplayName();
+          lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+        }
+      }
+    }
+    // Generic inventory handler.
+    else if (isIInventory && !isIWitHudInfo) {
+      List<ItemStack> invStacks = getInventoryStacks((IInventory) info.tileEntity);
+      // Display first n items according to config setting.
+      for (int i = 0; i < invStacks.size() && i < Config.hudInventoryMaxListCount; ++i) {
+        ItemStack stack = invStacks.get(i);
+        if (stack != null) {
+          int count = stack.stackSize;
+          String name = stack.getDisplayName();
+          lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+        }
+      }
+      // How many did we not display?
+      int omittedCount = invStacks.size() - Config.hudInventoryMaxListCount;
+      if (omittedCount > 0) {
+        String str2 = LocalizationHelper.instance.get("OmittedInventoryItems");
+        lines.add(String.format(str2, omittedCount));
+      }
+    }
+  }
+
+  public List<ItemStack> getInventoryStacks(IInventory inv) {
+
+    List<ItemStack> list = Lists.newArrayList();
+    ItemStack stack;
+    for (int i = 0; i < inv.getSizeInventory(); ++i) {
+      stack = inv.getStackInSlot(i);
+      if (stack != null) {
+        list.add(stack);
+      }
+    }
+    return list;
+  }
+
+  public void getLinesForBlockHarvestability(BlockStackInfo info) {
+
+    if (!Config.hudHarvestable.shouldDisplay(player)) {
+      return;
+    }
+
+    boolean canHarvest = info.meta >= 0 && info.meta < 16 // Bad metadata check
+        && ForgeHooks.canHarvestBlock(info.block, player, player.worldObj, info.pos)
+        && info.block.getBlockHardness(player.worldObj, info.pos) >= 0;
+    String format = canHarvest ? Config.hudHarvestable.formatString("")
+        : Config.hudHarvestable.formatString2("");
+
+    String line;
+    if (info.harvestTool != null && info.harvestLevel > -1) {
+      line = loc.get("HarvestWith");
+      String tool = loc.get("Tool." + info.harvestTool);
+      line = String.format(line, tool, info.harvestLevel);
+    } else {
+      line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
+    }
+    lines.add(format + line);
   }
 
   public void getLinesForItem(ItemStackInfo info) {
@@ -242,6 +322,12 @@ public class HudRenderObject {
     // Full name
     if (Config.hudResourceName.shouldDisplay(player)) {
       lines.add(Config.hudResourceName.formatString(info.unlocalizedName));
+    }
+
+    // WIT HUD info event
+    WitEntityInfoEvent event = new WitEntityInfoEvent(player, Config.hudAdvancedMode, entity);
+    if (!MinecraftForge.EVENT_BUS.post(event)) {
+      lines.addAll(event.lines);
     }
 
     // Mod name
