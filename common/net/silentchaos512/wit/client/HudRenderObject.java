@@ -273,14 +273,14 @@ public class HudRenderObject {
 
   public void getLinesForRfEnergyHandler(BlockStackInfo info) {
 
-    if (info.tileEntity instanceof IEnergyHandler && !(info.block instanceof IWitHudInfo)) {
-      IEnergyHandler tile = (IEnergyHandler) info.tileEntity;
-      int current = tile.getEnergyStored(EnumFacing.UP);
-      int max = tile.getMaxEnergyStored(EnumFacing.UP);
-      String str = LocalizationHelper.instance.get("RFStorage");
-      str = String.format(str, current, max);
-      lines.add(str);
-    }
+//    if (info.tileEntity instanceof IEnergyHandler && !(info.block instanceof IWitHudInfo)) {
+//      IEnergyHandler tile = (IEnergyHandler) info.tileEntity;
+//      int current = tile.getEnergyStored(EnumFacing.UP);
+//      int max = tile.getMaxEnergyStored(EnumFacing.UP);
+//      String str = LocalizationHelper.instance.get("RFStorage");
+//      str = String.format(str, current, max);
+//      lines.add(str);
+//    }
   }
 
   public List<ItemStack> getInventoryStacks(IInventory inv) {
