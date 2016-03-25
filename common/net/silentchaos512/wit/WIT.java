@@ -13,8 +13,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+<<<<<<< HEAD
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+=======
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MovingObjectPosition;
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;

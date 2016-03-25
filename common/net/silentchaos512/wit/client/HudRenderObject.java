@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+<<<<<<< HEAD
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -24,6 +25,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
+=======
+import net.minecraft.item.Item;
+import net.minecraft.util.EnumChatFormatting;
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -37,7 +42,10 @@ import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
 import net.silentchaos512.wit.info.ItemStackInfo;
+<<<<<<< HEAD
 import net.silentchaos512.wit.lib.LocalizationHelper;
+=======
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
 
 public class HudRenderObject {
 
@@ -114,11 +122,19 @@ public class HudRenderObject {
   public static void adjustBackgroundHeight(RenderGameOverlayEvent event, int maxHeight,
       boolean expand) {
 
+<<<<<<< HEAD
     float time = event.getPartialTicks() - lastPartialTicks;
     if (time < 0f) {
       time += 1f;
     }
     lastPartialTicks = event.getPartialTicks();
+=======
+    float time = event.partialTicks - lastPartialTicks;
+    if (time < 0f) {
+      time += 1f;
+    }
+    lastPartialTicks = event.partialTicks;
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
 
     lastMaxBackgroundHeight = maxHeight;
     if (backgroundHeight > maxHeight || !expand) {
@@ -165,6 +181,7 @@ public class HudRenderObject {
   }
 
   public void getLinesForBlock(BlockStackInfo info) {
+<<<<<<< HEAD
 
     boolean isIInventory = info.tileEntity instanceof IInventory;
     boolean isIWitHudInfo = info.block instanceof IWitHudInfo;
@@ -292,10 +309,51 @@ public class HudRenderObject {
       if (stack != null) {
         list.add(stack);
       }
+=======
+
+    // Name, ID, meta, tile entity
+    String line = info.item.getRarity(info.stack).rarityColor + info.localizedName;
+    line += shouldDisplayIdMeta() ? " [" + info.blockId + ":" + info.meta + "]" : "";
+    if (info.tileEntity != null) {
+      line += EnumChatFormatting.GRAY + " (TE)";
+    }
+    lines.add(line);
+
+    // Full name
+    if (shouldDisplayResourceName()) {
+      lines.add(format(Config.formatResourceName) + info.modId + ":"
+          + info.resourceLocation.getResourcePath());
+    }
+
+    // Mod name
+    if (shouldDisplayModName()) {
+      lines.add(format(Config.formatModName) + info.modName);
+    }
+  }
+
+  public void getLinesForItem(ItemStackInfo info) {
+
+    // Name, ID, meta, tile entity
+    String line = info.item.getRarity(info.stack).rarityColor + info.localizedName;
+    line += shouldDisplayIdMeta()
+        ? " [" + Item.getIdFromItem(info.item) + ":" + info.stack.getItemDamage() + "]" : "";
+    lines.add(line);
+
+    // Full name
+    if (shouldDisplayResourceName()) {
+      lines.add(format(Config.formatResourceName) + info.modId + ":"
+          + info.resourceLocation.getResourcePath());
+    }
+
+    // Mod name
+    if (shouldDisplayModName()) {
+      lines.add(format(Config.formatModName) + info.modName);
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
     }
     return list;
   }
 
+<<<<<<< HEAD
   public void getLinesForBlockHarvestability(BlockStackInfo info) {
 
     if (!Config.hudHarvestable.shouldDisplay(player)) {
@@ -309,6 +367,11 @@ public class HudRenderObject {
     String format = canHarvest ? Config.hudHarvestable.formatString("")
         : Config.hudHarvestable.formatString2("");
 
+=======
+  public void getLinesForEntity(EntityInfo info) {
+
+    Entity entity = info.entity;
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
     String line;
     if (info.harvestTool != null && info.harvestLevel > -1) {
       line = loc.get("HarvestWith");
@@ -329,6 +392,7 @@ public class HudRenderObject {
         " [" + Item.getIdFromItem(info.item) + ":" + info.stack.getItemDamage() + "]") : "";
     lines.add(line);
 
+<<<<<<< HEAD
     // Full (resource) name
     if (Config.hudResourceName.shouldDisplay(player)) {
       lines.add(Config.hudResourceName
@@ -338,6 +402,16 @@ public class HudRenderObject {
     // Mod name
     if (Config.hudModName.shouldDisplay(player)) {
       lines.add(Config.hudModName.formatString(info.modName));
+=======
+    // Full name
+    if (shouldDisplayResourceName()) {
+      lines.add(format(Config.formatResourceName) + info.unlocalizedName);
+    }
+
+    // Mod name
+    if (shouldDisplayModName()) {
+      lines.add(format(Config.formatModName) + info.modName);
+>>>>>>> 636846077d62a83cfce470a263bd2292e65ce35f
     }
   }
 
