@@ -5,56 +5,90 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
+import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
+import cofh.api.energy.IEnergyHandler;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
 import net.silentchaos512.wit.WIT;
+import net.silentchaos512.wit.api.IWitHudInfo;
+import net.silentchaos512.wit.api.WitBlockInfoEvent;
+import net.silentchaos512.wit.api.WitEntityInfoEvent;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
+import net.silentchaos512.wit.info.ItemStackInfo;
+import net.silentchaos512.wit.lib.LocalizationHelper;
 
 public class HudRenderObject {
 
   public static final int VERTICAL_LINE_SPACING = 2;
   public static final int BACKGROUND_PADDING = 3;
-  public static final int BACKGROUND_TRANSITION_TIME = 16;
+  public static final int BACKGROUND_TRANSITION_TIME = 4;
 
+  public static boolean renderHud = true;
   public static double backgroundHeight = 0.0;
   public static int lastMaxBackgroundWidth = 0;
   public static int lastMaxBackgroundHeight = 0;
   public static int lastBackgroundPosX = 0;
   public static int lastBackgroundPosY = 0;
+  public static float lastPartialTicks = 0f;
 
   BlockStackInfo blockInfo = null;
+  ItemStackInfo itemInfo = null;
   EntityInfo entityInfo = null;
+
+  LocalizationHelper loc = LocalizationHelper.instance;
 
   List<String> lines = Lists.newArrayList();
 
   Minecraft mc = Minecraft.getMinecraft();
+  EntityPlayer player = mc.thePlayer;
   FontRenderer fontRender = mc.fontRendererObj;
   boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
 
   public HudRenderObject(BlockStackInfo blockInfo) {
 
     this.blockInfo = blockInfo;
-    getLinesForBlock();
+    getLinesForBlock(blockInfo);
+  }
+
+  public HudRenderObject(ItemStackInfo itemInfo) {
+
+    this.itemInfo = itemInfo;
+    getLinesForItem(itemInfo);
   }
 
   public HudRenderObject(EntityInfo entityInfo) {
 
     this.entityInfo = entityInfo;
-    getLinesForEntity();
+    getLinesForEntity(entityInfo);
   }
 
   public void render(RenderGameOverlayEvent event) {
+
+    if (!renderHud) {
+      return;
+    }
 
     Tuple position = Config.hudPosition.getStartingPosition(this);
     int x = (Integer) position.getFirst();
@@ -64,7 +98,7 @@ public class HudRenderObject {
     int longestWidth = getWidth();
 
     // Render background
-    adjustBackgroundHeight(event, getHeight(), true);
+    adjustBackgroundHeight(event, getHeight() + 2 * BACKGROUND_PADDING, true);
     renderBackground(longestWidth, x, y);
 
     // Render text
@@ -80,24 +114,29 @@ public class HudRenderObject {
   public static void adjustBackgroundHeight(RenderGameOverlayEvent event, int maxHeight,
       boolean expand) {
 
+    float time = event.getPartialTicks() - lastPartialTicks;
+    if (time < 0f) {
+      time += 1f;
+    }
+    lastPartialTicks = event.getPartialTicks();
+
     lastMaxBackgroundHeight = maxHeight;
     if (backgroundHeight > maxHeight || !expand) {
-      backgroundHeight -= event.partialTicks * maxHeight / BACKGROUND_TRANSITION_TIME;
+      backgroundHeight -= time * maxHeight / BACKGROUND_TRANSITION_TIME;
       if (backgroundHeight < 0.0) {
         backgroundHeight = 0.0;
       }
     } else if (expand) {
-      backgroundHeight += event.partialTicks * maxHeight / BACKGROUND_TRANSITION_TIME;
+      backgroundHeight += time * maxHeight / BACKGROUND_TRANSITION_TIME;
       if (backgroundHeight > maxHeight) {
         backgroundHeight = maxHeight;
       }
     }
-    // backgroundHeight = MathHelper.clamp_double(backgroundHeight, 0, maxHeight);
   }
 
   public static void renderBackground(int maxWidth, int posX, int posY) {
 
-    if (backgroundHeight <= 0.0) {
+    if (!renderHud || backgroundHeight <= 0.0) {
       return;
     }
 
@@ -109,68 +148,235 @@ public class HudRenderObject {
     double x = posX - BACKGROUND_PADDING;
     double y = posY - BACKGROUND_PADDING + heightDifference / 2;
     double width = maxWidth + 2 * BACKGROUND_PADDING;
-    double height = backgroundHeight + 2 * BACKGROUND_PADDING;
+    double height = backgroundHeight;
 
     Minecraft.getMinecraft().renderEngine
         .bindTexture(new ResourceLocation(WIT.MOD_ID, "textures/background.png"));
-    GL11.glColor4f(1f, 1f, 1f, 0.8f); // TODO: Configs?
+    GL11.glColor4f(1f, 1f, 1f, Config.hudBackgroundOpacity);
 
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-    worldrenderer.startDrawingQuads();
-    worldrenderer.addVertexWithUV(x, y + height, 0, 0, 1);
-    worldrenderer.addVertexWithUV(x + width, y + height, 0, 1, 1);
-    worldrenderer.addVertexWithUV(x + width, y, 0, 1, 0);
-    worldrenderer.addVertexWithUV(x, y, 0, 0, 0);
+    VertexBuffer vbuffer = tessellator.getBuffer();
+    vbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    vbuffer.pos(x, y + height, 0).tex(0, 1).endVertex();
+    vbuffer.pos(x + width, y + height, 0).tex(1, 1).endVertex();
+    vbuffer.pos(x + width, y, 0).tex(1, 0).endVertex();
+    vbuffer.pos(x, y, 0).tex(0, 0).endVertex();
     tessellator.draw();
   }
 
-  public void getLinesForBlock() {
+  public void getLinesForBlock(BlockStackInfo info) {
+
+    boolean isIInventory = info.tileEntity instanceof IInventory;
+    boolean isIWitHudInfo = info.block instanceof IWitHudInfo;
 
     // Name, ID, meta, tile entity
-    String line = blockInfo.item.getRarity(blockInfo.stack).rarityColor + blockInfo.localizedName;
-    line += shouldDisplayIdMeta() ? " [" + blockInfo.blockId + ":" + blockInfo.meta + "]" : "";
-    if (blockInfo.tileEntity != null) {
-      line += EnumChatFormatting.GRAY + " (TE)";
+    String line = Config.hudObjectName.shouldDisplay(player)
+        ? info.item.getRarity(info.stack).rarityColor + info.localizedName : "";
+    line += Config.hudIdMeta.shouldDisplay(player)
+        ? Config.hudIdMeta.formatString(" [" + info.blockId + ":" + info.meta + "]") : "";
+    if (info.tileEntity != null && Config.hudTileEntity.shouldDisplay(player)) {
+      line += Config.hudTileEntity.formatString(" (TE)");
     }
     lines.add(line);
 
-    // Full name
-    if (shouldDisplayResourceName()) {
-      lines.add(format(Config.formatResourceName) + blockInfo.modId + ":"
-          + blockInfo.resourceLocation.getResourcePath());
+    // Inventory?
+    getLinesForBlockInventory(info, isIInventory, isIWitHudInfo);
+    // Mob spawner?
+    getLinesForMobSpawner(info);
+    // RF storage?
+    getLinesForRfEnergyHandler(info);
+
+    // Harvestability
+    getLinesForBlockHarvestability(info);
+
+    // Full (resource) name
+    if (Config.hudResourceName.shouldDisplay(player)) {
+      lines.add(Config.hudResourceName
+          .formatString(info.modId + ":" + info.resourceLocation.getResourcePath()));
+    }
+
+    // Block specific info?
+    if (isIWitHudInfo) {
+      List<String> extraList = ((IWitHudInfo) info.block).getWitLines(info.state, info.pos, player,
+          Config.hudAdvancedMode);
+      if (extraList != null) {
+        lines.addAll(extraList);
+      }
+    }
+
+    // WIT HUD info event
+    WitBlockInfoEvent event = new WitBlockInfoEvent(player, Config.hudAdvancedMode, info.pos,
+        info.state);
+    if (!MinecraftForge.EVENT_BUS.post(event)) {
+      lines.addAll(event.lines);
     }
 
     // Mod name
-    if (shouldDisplayModName()) {
-      lines.add(format(Config.formatModName) + blockInfo.modName);
+    if (Config.hudModName.shouldDisplay(player)) {
+      lines.add(Config.hudModName.formatString(info.modName));
     }
   }
 
-  public void getLinesForEntity() {
+  public void getLinesForBlockInventory(BlockStackInfo info, boolean isIInventory,
+      boolean isIWitHudInfo) {
 
-    Entity entity = entityInfo.entity;
+    if (!Config.hudBlockInventory.shouldDisplay(player)) {
+      return;
+    }
+
+    String str = "%s (%d)";
+
+    // Storage Drawers?
+    if (WIT.instance.foundStorageDrawers && info.tileEntity instanceof IDrawerGroup) {
+      IDrawerGroup drawers = (IDrawerGroup) info.tileEntity;
+      for (int i = 0; i < drawers.getDrawerCount(); ++i) {
+        IDrawer d = drawers.getDrawer(i);
+        if (d != null && d.getStoredItemPrototype() != null) {
+          int count = d.getStoredItemCount();
+          String name = d.getStoredItemPrototype().getDisplayName();
+          lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+        }
+      }
+    }
+    // Generic inventory handler.
+    else if (isIInventory && !isIWitHudInfo) {
+      List<ItemStack> invStacks = getInventoryStacks((IInventory) info.tileEntity);
+      // Display first n items according to config setting.
+      for (int i = 0; i < invStacks.size() && i < Config.hudInventoryMaxListCount; ++i) {
+        ItemStack stack = invStacks.get(i);
+        if (stack != null) {
+          int count = stack.stackSize;
+          String name = stack.getDisplayName();
+          lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+        }
+      }
+      // How many did we not display?
+      int omittedCount = invStacks.size() - Config.hudInventoryMaxListCount;
+      if (omittedCount > 0) {
+        String str2 = LocalizationHelper.instance.get("OmittedInventoryItems");
+        lines.add(String.format(str2, omittedCount));
+      }
+    }
+  }
+
+  public void getLinesForMobSpawner(BlockStackInfo info) {
+
+    if (info.tileEntity instanceof TileEntityMobSpawner) {
+      TileEntityMobSpawner tile = (TileEntityMobSpawner) info.tileEntity;
+      Entity entity = tile.getSpawnerBaseLogic().getCachedEntity();
+      if (entity != null) {
+        EntityInfo entityInfo = new EntityInfo(entity);
+        lines.add(entityInfo.localizedName);
+      }
+    }
+  }
+
+  public void getLinesForRfEnergyHandler(BlockStackInfo info) {
+
+    if (info.tileEntity instanceof IEnergyHandler && !(info.block instanceof IWitHudInfo)) {
+      IEnergyHandler tile = (IEnergyHandler) info.tileEntity;
+      int current = tile.getEnergyStored(EnumFacing.UP);
+      int max = tile.getMaxEnergyStored(EnumFacing.UP);
+      String str = LocalizationHelper.instance.get("RFStorage");
+      str = String.format(str, current, max);
+      lines.add(str);
+    }
+  }
+
+  public List<ItemStack> getInventoryStacks(IInventory inv) {
+
+    List<ItemStack> list = Lists.newArrayList();
+    ItemStack stack;
+    for (int i = 0; i < inv.getSizeInventory(); ++i) {
+      stack = inv.getStackInSlot(i);
+      if (stack != null) {
+        list.add(stack);
+      }
+    }
+    return list;
+  }
+
+  public void getLinesForBlockHarvestability(BlockStackInfo info) {
+
+    if (!Config.hudHarvestable.shouldDisplay(player)) {
+      return;
+    }
+
+    Block actualBlock = player.worldObj.getBlockState(info.pos).getBlock();
+    boolean canHarvest = info.meta >= 0 && info.meta < 16 // Bad metadata check
+        && ForgeHooks.canHarvestBlock(actualBlock, player, player.worldObj, info.pos)
+        && info.block.getBlockHardness(info.state, player.worldObj, info.pos) >= 0;
+    String format = canHarvest ? Config.hudHarvestable.formatString("")
+        : Config.hudHarvestable.formatString2("");
+
+    String line;
+    if (info.harvestTool != null && info.harvestLevel > -1) {
+      line = loc.get("HarvestWith");
+      String tool = loc.get("Tool." + info.harvestTool);
+      line = String.format(line, tool, info.harvestLevel);
+    } else {
+      line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
+    }
+    lines.add(format + line);
+  }
+
+  public void getLinesForItem(ItemStackInfo info) {
+
+    // Name, ID, meta, tile entity
+    String line = Config.hudObjectName.shouldDisplay(player)
+        ? info.item.getRarity(info.stack).rarityColor + info.localizedName : "";
+    line += Config.hudIdMeta.shouldDisplay(player) ? Config.hudIdMeta.formatString(
+        " [" + Item.getIdFromItem(info.item) + ":" + info.stack.getItemDamage() + "]") : "";
+    lines.add(line);
+
+    // Full (resource) name
+    if (Config.hudResourceName.shouldDisplay(player)) {
+      lines.add(Config.hudResourceName
+          .formatString(info.modId + ":" + info.resourceLocation.getResourcePath()));
+    }
+
+    // Mod name
+    if (Config.hudModName.shouldDisplay(player)) {
+      lines.add(Config.hudModName.formatString(info.modName));
+    }
+  }
+
+  public void getLinesForEntity(EntityInfo info) {
+
+    Entity entity = info.entity;
     String line;
 
     // Entity name
-    line = (entity.hasCustomName() ? EnumChatFormatting.ITALIC : "") + entity.getName();
-    line += shouldDisplayIdMeta() ? " [" + EntityList.getEntityID(entity) + "]" : "";
+    line = Config.hudObjectName.shouldDisplay(player) ? entity.getDisplayName().getFormattedText()
+        : "";
+    line += Config.hudIdMeta.shouldDisplay(player)
+        ? Config.hudIdMeta.formatString(" [" + EntityList.getEntityID(entity) + "]") : "";
     lines.add(line);
 
+    // Health
+    if (info.entity instanceof EntityLiving) {
+      EntityLiving entityLiving = (EntityLiving) info.entity;
+      line = Config.hudEntityHealth.shouldDisplay(player)
+          ? LocalizationHelper.instance.get("EntityHealth") : "";
+      line = String.format(line, entityLiving.getHealth(), entityLiving.getMaxHealth());
+      lines.add(line);
+    }
+
     // Full name
-    if (shouldDisplayResourceName()) {
-      lines.add(format(Config.formatResourceName) + entityInfo.unlocalizedName);
+    if (Config.hudResourceName.shouldDisplay(player)) {
+      lines.add(Config.hudResourceName.formatString(info.unlocalizedName));
+    }
+
+    // WIT HUD info event
+    WitEntityInfoEvent event = new WitEntityInfoEvent(player, Config.hudAdvancedMode, entity);
+    if (!MinecraftForge.EVENT_BUS.post(event)) {
+      lines.addAll(event.lines);
     }
 
     // Mod name
-    if (shouldDisplayModName()) {
-      lines.add(format(Config.formatModName) + entityInfo.modName);
+    if (Config.hudModName.shouldDisplay(player)) {
+      lines.add(Config.hudModName.formatString(info.modName));
     }
-  }
-
-  public String format(String str) {
-
-    return str.replaceAll("&", "\u00a7");
   }
 
   public int getWidth() {
@@ -187,35 +393,5 @@ public class HudRenderObject {
   public int getHeight() {
 
     return fontRender.FONT_HEIGHT * lines.size() + VERTICAL_LINE_SPACING * (lines.size() - 1);
-  }
-
-  public boolean shouldDisplayResourceName() {
-
-    if (Config.hudDisplayResourceName) {
-      if ((Config.hudDisplayResourceNameShift && sneaking) || !Config.hudDisplayResourceNameShift) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean shouldDisplayModName() {
-
-    if (Config.hudDisplayModName) {
-      if ((Config.hudDisplayModNameShift && sneaking) || !Config.hudDisplayModNameShift) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean shouldDisplayIdMeta() {
-
-    if (Config.hudDisplayIdMeta) {
-      if ((Config.hudDisplayIdMetaShift && sneaking) || !Config.hudDisplayIdMetaShift) {
-        return true;
-      }
-    }
-    return false;
   }
 }

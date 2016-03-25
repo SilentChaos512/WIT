@@ -15,7 +15,7 @@ public enum EnumHudPosition {
     
     int screenWidth = Minecraft.getMinecraft().displayWidth;
     int screenHeight = Minecraft.getMinecraft().displayHeight;
-    ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft(), screenWidth, screenHeight);
+    ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
     screenWidth = res.getScaledWidth();
     screenHeight = res.getScaledHeight();
     int objectWidth = renderObject.getWidth();
@@ -42,5 +42,14 @@ public enum EnumHudPosition {
       default:
         return new Tuple(0, 0);
     }
+  }
+
+  public static String[] getValidValues() {
+
+    String[] result = new String[values().length];
+    for (int i = 0; i < values().length; ++i) {
+      result[i] = values()[i].name();
+    }
+    return result;
   }
 }

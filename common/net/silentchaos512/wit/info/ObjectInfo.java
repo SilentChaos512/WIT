@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
@@ -35,7 +35,7 @@ public class ObjectInfo {
     }
 
     this.unlocalizedName = unlocalizedName;
-    this.localizedName = StatCollector.translateToLocal(unlocalizedName + ".name");
+    this.localizedName = I18n.translateToLocal(unlocalizedName + ".name");
   }
   
   public ObjectInfo(ModContainer mod, Entity entity) {
@@ -50,7 +50,7 @@ public class ObjectInfo {
     }
 
     this.unlocalizedName = EntityList.getEntityString(entity);
-    this.localizedName = entity.getName();
+    this.localizedName = entity.getDisplayName().getFormattedText();
   }
 
   public ObjectInfo(Entity entity) {
@@ -60,7 +60,7 @@ public class ObjectInfo {
 
   public ObjectInfo(ItemStack stack) {
 
-    this(getModFromItem(stack.getItem()), stack.getItem().getUnlocalizedName(stack));
+    this(getModFromItem(stack), stack.getItem().getUnlocalizedName(stack));
   }
 
   public static ModContainer getModFromEntity(Entity entity) {
@@ -77,8 +77,9 @@ public class ObjectInfo {
     return null;
   }
 
-  public static ModContainer getModFromItem(Item item) {
+  public static ModContainer getModFromItem(ItemStack stack) {
 
+    Item item = stack.getItem();
     if (item == null) {
       return null;
     }

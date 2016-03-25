@@ -8,6 +8,7 @@ public class CommonProxy {
 
   public void init() {
 
+    registerKeyHandlers();
   }
   
   public void postInit() {
