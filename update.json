@@ -1,0 +1,15 @@
+{
+  "homepage": "http://minecraft.curseforge.com/projects/wit-what-is-that/files",
+  "promos": {
+    "1.9-latest": "1.0.10",
+    "1.9-recommended": "1.0.10"
+    "1.8.9-latest": "1.0.8",
+    "1.8.9-recommended": "1.0.8"
+  },
+  "1.9": {
+    "1.0.10" : "See: https://github.com/SilentChaos512/WIT/blob/master/wit-changelog.txt"
+  },
+  "1.8.9": {
+    "1.0.8" : "See: https://github.com/SilentChaos512/WIT/blob/master/wit-changelog.txt"
+  }
+}
