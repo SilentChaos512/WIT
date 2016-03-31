@@ -183,12 +183,14 @@ public class WIT {
 
     WitBlockReplacements.init();
     WitBlockReplacements rep = WitBlockReplacements.instance;
-    rep.add(new ItemStack(Blocks.monster_egg, 1, 0), new ItemStack(Blocks.stone));
-    rep.add(new ItemStack(Blocks.monster_egg, 1, 1), new ItemStack(Blocks.cobblestone));
-    rep.add(new ItemStack(Blocks.monster_egg, 1, 2), new ItemStack(Blocks.stonebrick, 1, 0));
-    rep.add(new ItemStack(Blocks.monster_egg, 1, 3), new ItemStack(Blocks.stonebrick, 1, 1));
-    rep.add(new ItemStack(Blocks.monster_egg, 1, 4), new ItemStack(Blocks.stonebrick, 1, 2));
-    rep.add(new ItemStack(Blocks.monster_egg, 1, 5), new ItemStack(Blocks.stonebrick, 1, 3));
+    if (Config.disguiseMonsterEggBlocks) {
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 0), new ItemStack(Blocks.stone));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 1), new ItemStack(Blocks.cobblestone));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 2), new ItemStack(Blocks.stonebrick, 1, 0));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 3), new ItemStack(Blocks.stonebrick, 1, 1));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 4), new ItemStack(Blocks.stonebrick, 1, 2));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 5), new ItemStack(Blocks.stonebrick, 1, 3));
+    }
   }
 
   public boolean shouldDisplayModName() {

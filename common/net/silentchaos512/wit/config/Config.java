@@ -56,6 +56,7 @@ public class Config {
   public static float hudBackgroundOpacity = 0.8f;
   public static boolean hudAdvancedMode = false;
   public static int hudInventoryMaxListCount = 8;
+  public static boolean disguiseMonsterEggBlocks = true;
 
   /*
    * Tooltip display options
@@ -149,6 +150,9 @@ public class Config {
       hudInventoryMaxListCount = c.getInt("Max Inventory List Count", CAT_HUD_DISPLAY,
           hudInventoryMaxListCount, 0, 64,
           "The maximum number of items to display for inventory contents.");
+      disguiseMonsterEggBlocks = c.getBoolean("Disguise Monster Egg Blocks", CAT_HUD_DISPLAY,
+          disguiseMonsterEggBlocks,
+          "Show monster egg (silverfish) blocks as the blocks they look like in the HUD (requires restart)");
 
       /*
        * Tooltip display options
