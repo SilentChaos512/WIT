@@ -5,3 +5,4 @@ wit:Tool.pickaxe=Pickaxe
 wit:Tool.shovel=Shovel
 wit:Tool.axe=Axe
 wit:OmittedInventoryItems=Plus %d more...
+wit:RFStorage=%,d / %,d RF

@@ -1,3 +1,6 @@
+1.0.8
+Added: Displays RF stored in energy handlers. Doesn't work especially well though.
+
 1.0.7
 Added: Monster spawners now display the name of what they spawn.
 Changed: Monster egg blocks are now hidden.

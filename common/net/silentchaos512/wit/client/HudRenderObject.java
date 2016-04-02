@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
+import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -21,6 +22,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -180,6 +182,9 @@ public class HudRenderObject {
     getLinesForBlockInventory(info, isIInventory, isIWitHudInfo);
     // Mob spawner?
     getLinesForMobSpawner(info);
+    // RF storage?
+    getLinesForRfEnergyHandler(info);
+
     // Harvestability
     getLinesForBlockHarvestability(info);
 
@@ -265,6 +270,18 @@ public class HudRenderObject {
     }
   }
 
+  public void getLinesForRfEnergyHandler(BlockStackInfo info) {
+
+//    if (info.tileEntity instanceof IEnergyHandler && !(info.block instanceof IWitHudInfo)) {
+//      IEnergyHandler tile = (IEnergyHandler) info.tileEntity;
+//      int current = tile.getEnergyStored(EnumFacing.UP);
+//      int max = tile.getMaxEnergyStored(EnumFacing.UP);
+//      String str = LocalizationHelper.instance.get("RFStorage");
+//      str = String.format(str, current, max);
+//      lines.add(str);
+//    }
+  }
+
   public List<ItemStack> getInventoryStacks(IInventory inv) {
 
     List<ItemStack> list = Lists.newArrayList();
@@ -329,8 +346,7 @@ public class HudRenderObject {
     String line;
 
     // Entity name
-    line = Config.hudObjectName.shouldDisplay(player) ? entity.getDisplayName().getFormattedText()
-        : "";
+    line = Config.hudObjectName.shouldDisplay(player) ? info.localizedName : "";
     line += Config.hudIdMeta.shouldDisplay(player)
         ? Config.hudIdMeta.formatString(" [" + EntityList.getEntityID(entity) + "]") : "";
     lines.add(line);

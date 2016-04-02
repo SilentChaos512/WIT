@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //    id "net.minecraftforge.gradle.forge" version "2.0.2"
 //}
 
-version = "1.0.7"
+version = "1.0.8"
 group= "net.silentchaos512.wit" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "WIT-1.8.9"
 
