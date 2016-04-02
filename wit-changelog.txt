@@ -1,5 +1,8 @@
+1.0.11
+Possibly fixed a crash caused by looking at inventories that contain items that fail to get their display names.
+
 1.0.10
-Added: Config to disable disguising of monster egg (silverfish) blocks (Look under HUD > Display). Requires a game restart when changed.
+Added: Config to disable disguising of monster egg (silverfish) blocks (look under HUD > Display). Requires a game restart when changed.
 
 1.0.9
 Updated for Forge 1805+.

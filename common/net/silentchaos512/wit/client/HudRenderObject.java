@@ -26,6 +26,7 @@ import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
@@ -245,9 +246,14 @@ public class HudRenderObject {
       for (int i = 0; i < invStacks.size() && i < Config.hudInventoryMaxListCount; ++i) {
         ItemStack stack = invStacks.get(i);
         if (stack != null) {
-          int count = stack.stackSize;
-          String name = stack.getDisplayName();
-          lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+          try {
+            int count = stack.stackSize;
+            String name = stack.getDisplayName();
+            lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+          } catch (Exception ex) {
+            // Looks like a mod has done something stupid with their items...
+            lines.add(TextFormatting.RED + "<I AM ERROR!>");
+          }
         }
       }
       // How many did we not display?
@@ -273,14 +279,14 @@ public class HudRenderObject {
 
   public void getLinesForRfEnergyHandler(BlockStackInfo info) {
 
-//    if (info.tileEntity instanceof IEnergyHandler && !(info.block instanceof IWitHudInfo)) {
-//      IEnergyHandler tile = (IEnergyHandler) info.tileEntity;
-//      int current = tile.getEnergyStored(EnumFacing.UP);
-//      int max = tile.getMaxEnergyStored(EnumFacing.UP);
-//      String str = LocalizationHelper.instance.get("RFStorage");
-//      str = String.format(str, current, max);
-//      lines.add(str);
-//    }
+    // if (info.tileEntity instanceof IEnergyHandler && !(info.block instanceof IWitHudInfo)) {
+    // IEnergyHandler tile = (IEnergyHandler) info.tileEntity;
+    // int current = tile.getEnergyStored(EnumFacing.UP);
+    // int max = tile.getMaxEnergyStored(EnumFacing.UP);
+    // String str = LocalizationHelper.instance.get("RFStorage");
+    // str = String.format(str, current, max);
+    // lines.add(str);
+    // }
   }
 
   public List<ItemStack> getInventoryStacks(IInventory inv) {
