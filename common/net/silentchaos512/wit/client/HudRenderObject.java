@@ -353,8 +353,7 @@ public class HudRenderObject {
     String line;
 
     // Entity name
-    line = Config.hudObjectName.shouldDisplay(player) ? entity.getDisplayName().getFormattedText()
-        : "";
+    line = Config.hudObjectName.shouldDisplay(player) ? info.localizedName : "";
     line += Config.hudIdMeta.shouldDisplay(player)
         ? Config.hudIdMeta.formatString(" [" + EntityList.getEntityID(entity) + "]") : "";
     lines.add(line);

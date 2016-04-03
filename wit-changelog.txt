@@ -1,3 +1,6 @@
+1.0.12
+Fixed a crash when entities return null for their display name (example: BuildCraft robots)
+
 1.0.11
 Possibly fixed a crash caused by looking at inventories that contain items that fail to get their display names.
 

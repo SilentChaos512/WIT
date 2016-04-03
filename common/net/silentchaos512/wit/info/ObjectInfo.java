@@ -37,7 +37,7 @@ public class ObjectInfo {
     this.unlocalizedName = unlocalizedName;
     this.localizedName = I18n.translateToLocal(unlocalizedName + ".name");
   }
-  
+
   public ObjectInfo(ModContainer mod, Entity entity) {
 
     this.mod = mod;
@@ -49,8 +49,11 @@ public class ObjectInfo {
       this.modName = mod.getName();
     }
 
-    this.unlocalizedName = EntityList.getEntityString(entity);
-    this.localizedName = entity.getDisplayName().getFormattedText();
+    String entityString = EntityList.getEntityString(entity);
+    this.unlocalizedName = entityString == null || entityString.isEmpty() ? "unknown"
+        : entityString;
+    this.localizedName = entity.getDisplayName() != null
+        ? entity.getDisplayName().getUnformattedTextForChat() : unlocalizedName;
   }
 
   public ObjectInfo(Entity entity) {
