@@ -87,8 +87,7 @@ public class ObjectInfo {
       return null;
     }
 
-    ResourceLocation location = (ResourceLocation) GameData.getItemRegistry()
-        .getNameForObject(item);
+    ResourceLocation location = item.getRegistryName();
     return WIT.instance.mods.get(location.getResourceDomain());
   }
 }
