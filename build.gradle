@@ -17,7 +17,7 @@ group= "net.silentchaos512.wit" // http://maven.apache.org/guides/mini/guide-nam
 archivesBaseName = "WIT-1.9"
 
 minecraft {
-    version = "1.9-12.16.0.1826-1.9"
+    version = "1.9-12.16.0.1833-1.9"
     runDir = "eclipse"
     
     replace "@VERSION@", project.version
@@ -32,10 +32,10 @@ dependencies {
 }
 
 sourceSets {
-  main {
-    java { srcDirs = ["$projectDir/common"] }
-    resources { srcDirs = ["$projectDir/resources"] }
-  }
+    main {
+        java { srcDirs = ["$projectDir/common"] }
+        resources { srcDirs = ["$projectDir/resources"] }
+    }
 }
 
 processResources

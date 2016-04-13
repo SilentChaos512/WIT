@@ -19,6 +19,9 @@ public class WitBlockReplacements {
 
   private int getKeyFromStack(ItemStack stack) {
 
+    if (stack == null || stack.getItem() == null) {
+      return -1;
+    }
     return Item.getIdFromItem(stack.getItem()) + (stack.getItemDamage() << 16);
   }
 

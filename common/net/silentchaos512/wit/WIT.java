@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mcmultipart.multipart.Multipart;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -33,6 +34,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.client.HudRenderObject;
 import net.silentchaos512.wit.client.key.KeyTracker;
+import net.silentchaos512.wit.compat.multipart.MCMultiPartHandler;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
@@ -60,6 +62,7 @@ public class WIT {
   float lastPartialTicks = 0f;
 
   public boolean foundStorageDrawers = false;
+  public boolean foundMcMultiPart = false;
 
   @Instance(MOD_ID)
   public static WIT instance;
@@ -95,6 +98,7 @@ public class WIT {
 
     proxy.postInit();
     foundStorageDrawers = Loader.isModLoaded("StorageDrawers");
+    foundMcMultiPart = Loader.isModLoaded("mcmultipart");
   }
 
   @SubscribeEvent
@@ -110,6 +114,13 @@ public class WIT {
   public void onTooltip(ItemTooltipEvent event) {
 
     ItemStackInfo itemInfo = new ItemStackInfo(event.getItemStack());
+
+    if (Config.tooltipDisplayIdMeta && !event.isShowAdvancedItemTooltips()) {
+      String str = event.getToolTip().get(0);
+      str += " " + Item.getIdFromItem(itemInfo.stack.getItem()) + ":"
+          + itemInfo.stack.getItemDamage();
+      event.getToolTip().set(0, str);
+    }
 
     // Ore dictionary entries
     if (shouldDisplayOreDict()) {
@@ -165,6 +176,11 @@ public class WIT {
               ItemStackInfo itemInfo = new ItemStackInfo(new ItemStack(itemDrop));
               renderObject = new HudRenderObject(itemInfo);
             }
+          }
+
+          // Multipart?
+          if (renderObject == null && foundMcMultiPart) {
+            renderObject = MCMultiPartHandler.getForMultiPart();
           }
         }
       }

@@ -62,6 +62,8 @@ public class Config {
    * Tooltip display options
    */
 
+  public static boolean tooltipDisplayIdMeta = false;
+  public static String tooltipDisplayIdMetaComment = "Display the item ID and damage value by the item name.";
   public static boolean tooltipDisplayModName = true;
   public static String tooltipDisplayModNameComment = "Display the name of the mod in tooltips.";
   public static boolean tooltipDisplayModNameShift = false;
@@ -158,6 +160,8 @@ public class Config {
        * Tooltip display options
        */
 
+      tooltipDisplayIdMeta = c.getBoolean("ID and Metadata", CAT_TOOLTIP, tooltipDisplayIdMeta,
+          tooltipDisplayIdMetaComment);
       tooltipDisplayModName = c.getBoolean("Mod Name - Show", CAT_TOOLTIP, tooltipDisplayModName,
           tooltipDisplayModNameComment);
       tooltipDisplayModNameShift = c.getBoolean("Mod Name - Sneak Only", CAT_TOOLTIP,

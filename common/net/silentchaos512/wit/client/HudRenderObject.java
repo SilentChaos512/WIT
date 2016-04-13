@@ -31,6 +31,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.silentchaos512.wit.WIT;
+import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.api.IWitHudInfo;
 import net.silentchaos512.wit.api.WitBlockInfoEvent;
 import net.silentchaos512.wit.api.WitEntityInfoEvent;
@@ -57,6 +58,7 @@ public class HudRenderObject {
   BlockStackInfo blockInfo = null;
   ItemStackInfo itemInfo = null;
   EntityInfo entityInfo = null;
+  IInfoObject info = null;
 
   LocalizationHelper loc = LocalizationHelper.instance;
 
@@ -66,6 +68,11 @@ public class HudRenderObject {
   EntityPlayer player = mc.thePlayer;
   FontRenderer fontRender = mc.fontRendererObj;
   boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
+
+  public HudRenderObject(IInfoObject info) {
+
+    this.info = info;
+  }
 
   public HudRenderObject(BlockStackInfo blockInfo) {
 
@@ -89,6 +96,11 @@ public class HudRenderObject {
 
     if (!renderHud) {
       return;
+    }
+
+    // Get text
+    if (info != null) {
+      info.addLines(Minecraft.getMinecraft().thePlayer, lines);
     }
 
     Tuple position = Config.hudPosition.getStartingPosition(this);

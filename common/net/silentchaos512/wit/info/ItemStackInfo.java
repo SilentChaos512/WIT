@@ -2,6 +2,8 @@ package net.silentchaos512.wit.info;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.Lists;
 
 import net.minecraft.item.Item;
@@ -22,7 +24,7 @@ public class ItemStackInfo extends ObjectInfo {
   // Names
   public final String itemName;
 
-  public ItemStackInfo(ItemStack stack) {
+  public ItemStackInfo(@Nonnull ItemStack stack) {
 
     super(WitBlockReplacements.instance.get(stack));
 

@@ -1,5 +1,7 @@
 package net.silentchaos512.wit.info;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
@@ -9,7 +11,6 @@ import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
-import net.minecraftforge.fml.common.registry.GameData;
 import net.silentchaos512.wit.WIT;
 
 public class ObjectInfo {
@@ -61,7 +62,7 @@ public class ObjectInfo {
     this(getModFromEntity(entity), entity);
   }
 
-  public ObjectInfo(ItemStack stack) {
+  public ObjectInfo(@Nonnull ItemStack stack) {
 
     this(getModFromItem(stack), stack.getItem().getUnlocalizedName(stack));
   }
@@ -81,6 +82,10 @@ public class ObjectInfo {
   }
 
   public static ModContainer getModFromItem(ItemStack stack) {
+
+    if (stack == null) {
+      return null;
+    }
 
     Item item = stack.getItem();
     if (item == null) {
