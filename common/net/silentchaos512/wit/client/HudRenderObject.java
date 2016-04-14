@@ -12,6 +12,7 @@ import cofh.api.energy.IEnergyHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -26,6 +27,7 @@ import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.ForgeHooks;
@@ -103,10 +105,14 @@ public class HudRenderObject {
       info.addLines(Minecraft.getMinecraft().thePlayer, lines);
     }
 
-    Tuple position = Config.hudPosition.getStartingPosition(this);
+    ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
+
+    Tuple position = Config.hudPosition.getStartingPosition(this, resolution);
     int x = (Integer) position.getFirst();
     int y = (Integer) position.getSecond();
-    // System.out.println(x + ", " + y);
+    x += Config.hudOffsetX * resolution.getScaledWidth();
+    y += Config.hudOffsetY * resolution.getScaledHeight();
+
     int lineWidth, diff;
     int longestWidth = getWidth();
 

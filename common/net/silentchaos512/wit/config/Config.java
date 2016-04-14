@@ -54,6 +54,8 @@ public class Config {
   //@formatter:on
 
   public static float hudBackgroundOpacity = 0.8f;
+  public static float hudOffsetX = 0.0f;
+  public static float hudOffsetY = 0.0f;
   public static boolean hudAdvancedMode = false;
   public static int hudInventoryMaxListCount = 8;
   public static boolean disguiseMonsterEggBlocks = true;
@@ -133,6 +135,11 @@ public class Config {
           hudPosition = p;
         }
       }
+
+      hudOffsetX = c.getFloat("X Offset", CAT_HUD_POSITION, hudOffsetX, -1.0f, 1.0f,
+          "Fine-tune the position of the HUD.");
+      hudOffsetY = c.getFloat("Y Offset", CAT_HUD_POSITION, hudOffsetY, -1.0f, 1.0f,
+          "Fine-tune the position of the HUD.");
 
       /*
        * HUD display options

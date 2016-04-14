@@ -1,3 +1,11 @@
+1.0.14
+Added: MCMultiPart support.
+Added: Config to offset the HUD, allowing the position to be fine-tuned.
+Added: Config to add ID/meta after item name, disabled by default.
+
+1.0.13
+Updated for Forge 1833.
+
 1.0.12
 Fixed a crash when entities return null for their display name (example: BuildCraft robots)
 

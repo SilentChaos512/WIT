@@ -11,11 +11,10 @@ public enum EnumHudPosition {
   
   public static final int PADDING = 5;
   
-  public Tuple getStartingPosition(HudRenderObject renderObject) {
+  public Tuple getStartingPosition(HudRenderObject renderObject, ScaledResolution res) {
     
     int screenWidth = Minecraft.getMinecraft().displayWidth;
     int screenHeight = Minecraft.getMinecraft().displayHeight;
-    ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
     screenWidth = res.getScaledWidth();
     screenHeight = res.getScaledHeight();
     int objectWidth = renderObject.getWidth();
