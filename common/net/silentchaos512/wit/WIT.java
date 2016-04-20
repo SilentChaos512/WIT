@@ -161,12 +161,12 @@ public class WIT {
         // Looking at a Block.
         BlockPos pos = mop.getBlockPos();
         IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() != null && state.getBlock() != Blocks.AIR) {
+        if (state.getBlock() != null && state.getBlock() != Blocks.air) {
           ItemStack blockStack = new ItemStack(state.getBlock());
           // In some cases, blocks have no item (example, lit redstone).
           if (blockStack.getItem() != null) {
             BlockStackInfo blockInfo = new BlockStackInfo(state, pos);
-            if (blockInfo.block != Blocks.AIR && blockInfo.item != null) {
+            if (blockInfo.block != Blocks.air && blockInfo.item != null) {
               renderObject = new HudRenderObject(blockInfo);
             }
           } else {
@@ -200,12 +200,12 @@ public class WIT {
     WitBlockReplacements.init();
     WitBlockReplacements rep = WitBlockReplacements.instance;
     if (Config.disguiseMonsterEggBlocks) {
-      rep.add(new ItemStack(Blocks.MONSTER_EGG, 1, 0), new ItemStack(Blocks.STONE));
-      rep.add(new ItemStack(Blocks.MONSTER_EGG, 1, 1), new ItemStack(Blocks.COBBLESTONE));
-      rep.add(new ItemStack(Blocks.MONSTER_EGG, 1, 2), new ItemStack(Blocks.STONEBRICK, 1, 0));
-      rep.add(new ItemStack(Blocks.MONSTER_EGG, 1, 3), new ItemStack(Blocks.STONEBRICK, 1, 1));
-      rep.add(new ItemStack(Blocks.MONSTER_EGG, 1, 4), new ItemStack(Blocks.STONEBRICK, 1, 2));
-      rep.add(new ItemStack(Blocks.MONSTER_EGG, 1, 5), new ItemStack(Blocks.STONEBRICK, 1, 3));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 0), new ItemStack(Blocks.stone));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 1), new ItemStack(Blocks.cobblestone));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 2), new ItemStack(Blocks.stonebrick, 1, 0));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 3), new ItemStack(Blocks.stonebrick, 1, 1));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 4), new ItemStack(Blocks.stonebrick, 1, 2));
+      rep.add(new ItemStack(Blocks.monster_egg, 1, 5), new ItemStack(Blocks.stonebrick, 1, 3));
     }
   }
 
