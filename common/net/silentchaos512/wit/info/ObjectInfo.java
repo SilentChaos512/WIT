@@ -54,7 +54,7 @@ public class ObjectInfo {
     this.unlocalizedName = entityString == null || entityString.isEmpty() ? "unknown"
         : entityString;
     this.localizedName = entity.getDisplayName() != null
-        ? entity.getDisplayName().getUnformattedTextForChat() : unlocalizedName;
+        ? entity.getDisplayName().getUnformattedText() : unlocalizedName;
   }
 
   public ObjectInfo(Entity entity) {
