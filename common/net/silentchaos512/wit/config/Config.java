@@ -74,6 +74,14 @@ public class Config {
   public static String tooltipDisplayOreDictComment = "Display the ore dictionary entries for the block/item.";
   public static boolean tooltipDisplayOreDictShift = true;
   public static String tooltipDisplayOreDictShiftComment = "Display the ore dictionary entries only when holding shift.";
+  public static boolean tooltipDisplayFoodStats = true;
+  public static String tooltipDisplayFoodStatsComment = "Display the food value and saturation of foods in the tooltip.";
+  public static boolean tooltipDisplayFoodStatsShift = true;
+  public static String tooltipDisplayFoodStatsShiftComment = "Display food stats only when holding shift.";
+  public static boolean tooltipDisplayToolStats = true;
+  public static String tooltipDisplayToolStatsComment = "Display mining speed and durability of tools when possible.";
+  public static boolean tooltipDisplayToolStatsShift = true;
+  public static String tooltipDisplayToolStatsShiftComment = "Display tool stats only when shift is held.";
 
   /*
    * Formatting
@@ -177,6 +185,14 @@ public class Config {
           tooltipDisplayOreDict, tooltipDisplayOreDictComment);
       tooltipDisplayOreDictShift = c.getBoolean("Ore Dictionary - Sneak Only", CAT_TOOLTIP,
           tooltipDisplayOreDictShift, tooltipDisplayOreDictShiftComment);
+      tooltipDisplayFoodStats = c.getBoolean("Food Stats", CAT_TOOLTIP, tooltipDisplayFoodStats,
+          tooltipDisplayFoodStatsComment);
+      tooltipDisplayFoodStatsShift = c.getBoolean("Food Stats - Sneak Only", CAT_TOOLTIP,
+          tooltipDisplayFoodStatsShift, tooltipDisplayFoodStatsShiftComment);
+      tooltipDisplayToolStats = c.getBoolean("Tool Stats", CAT_TOOLTIP, tooltipDisplayToolStats,
+          tooltipDisplayToolStatsComment);
+      tooltipDisplayToolStatsShift = c.getBoolean("Tool Stats - Sneak Only", CAT_TOOLTIP,
+          tooltipDisplayToolStatsShift, tooltipDisplayToolStatsShiftComment);
 
       /*
        * Formatting

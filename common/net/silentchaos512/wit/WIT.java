@@ -7,13 +7,17 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mcmultipart.multipart.Multipart;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -115,11 +119,36 @@ public class WIT {
 
     ItemStackInfo itemInfo = new ItemStackInfo(event.getItemStack());
 
+    // ID & meta
     if (Config.tooltipDisplayIdMeta && !event.isShowAdvancedItemTooltips()) {
       String str = event.getToolTip().get(0);
       str += " " + Item.getIdFromItem(itemInfo.stack.getItem()) + ":"
           + itemInfo.stack.getItemDamage();
       event.getToolTip().set(0, str);
+    }
+
+    // Tool stats
+    if (shouldDipslayToolStats() && itemInfo.item instanceof ItemTool) {
+      ItemTool itemTool = (ItemTool) itemInfo.item;
+      IBlockState state = getBlockForToolSpeed(itemTool);
+      if (state != null) {
+        String str = String.format("%.1f", itemTool.getStrVsBlock(itemInfo.stack, state));
+        str = String.format(LocalizationHelper.instance.get("ToolSpeed"), str);
+        event.getToolTip().add(str);
+      }
+      int maxDamage = itemTool.getMaxDamage(itemInfo.stack);
+      String str = String.format(LocalizationHelper.instance.get("ToolMaxDamage"), maxDamage);
+      event.getToolTip().add(str);
+    }
+
+    // Food stats
+    if (shouldDisplayFoodStats() && itemInfo.item instanceof ItemFood) {
+      ItemFood itemFood = (ItemFood) itemInfo.item;
+      String str = "%d (%.1f)";
+      str = String.format(str, itemFood.getHealAmount(itemInfo.stack),
+          itemFood.getSaturationModifier(itemInfo.stack));
+      str = String.format(LocalizationHelper.instance.get("Food"), str);
+      event.getToolTip().add(str);
     }
 
     // Ore dictionary entries
@@ -133,6 +162,7 @@ public class WIT {
       }
     }
 
+    // Mod name
     if (shouldDisplayModName()) {
       event.getToolTip().add(Config.formatModName.replaceAll("&", "\u00a7") + itemInfo.modName);
     }
@@ -211,23 +241,38 @@ public class WIT {
 
   public boolean shouldDisplayModName() {
 
-    if (Config.tooltipDisplayModName) {
-      if ((Config.tooltipDisplayModNameShift && KeyTracker.instance.isShiftPressed())
-          || !Config.tooltipDisplayModNameShift) {
-        return true;
-      }
-    }
-    return false;
+    return shouldDisplayObject(Config.tooltipDisplayModName, Config.tooltipDisplayModNameShift);
   }
 
   public boolean shouldDisplayOreDict() {
 
-    if (Config.tooltipDisplayOreDict) {
-      if ((Config.tooltipDisplayOreDictShift && KeyTracker.instance.isShiftPressed())
-          || !Config.tooltipDisplayOreDictShift) {
-        return true;
-      }
+    return shouldDisplayObject(Config.tooltipDisplayOreDict, Config.tooltipDisplayOreDictShift);
+  }
+
+  public boolean shouldDisplayFoodStats() {
+
+    return shouldDisplayObject(Config.tooltipDisplayFoodStats, Config.tooltipDisplayFoodStatsShift);
+  }
+
+  public boolean shouldDipslayToolStats() {
+
+    return shouldDisplayObject(Config.tooltipDisplayToolStats, Config.tooltipDisplayToolStatsShift);
+  }
+
+  private boolean shouldDisplayObject(boolean display, boolean shiftOnly) {
+
+    return display ? (shiftOnly && KeyTracker.instance.isShiftPressed()) || !shiftOnly : false;
+  }
+
+  private IBlockState getBlockForToolSpeed(ItemTool itemTool) {
+
+    if (itemTool instanceof ItemPickaxe) {
+      return Blocks.STONE.getDefaultState();
+    } else if (itemTool instanceof ItemSpade) {
+      return Blocks.DIRT.getDefaultState();
+    } else if (itemTool instanceof ItemAxe) {
+      return Blocks.LOG.getDefaultState();
     }
-    return false;
+    return null;
   }
 }

@@ -379,10 +379,12 @@ public class HudRenderObject {
     // Health
     if (info.entity instanceof EntityLiving) {
       EntityLiving entityLiving = (EntityLiving) info.entity;
-      line = Config.hudEntityHealth.shouldDisplay(player)
-          ? LocalizationHelper.instance.get("EntityHealth") : "";
-      line = String.format(line, entityLiving.getHealth(), entityLiving.getMaxHealth());
-      lines.add(line);
+      if (Config.hudEntityHealth.shouldDisplay(player)) {
+        line = LocalizationHelper.instance.get("EntityHealth");
+        String current = String.format("%.1f", entityLiving.getHealth());
+        String max = String.format("%.1f", entityLiving.getMaxHealth());
+        lines.add(String.format(line, current, max));
+      }
     }
 
     // Full name

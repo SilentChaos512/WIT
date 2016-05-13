@@ -1,3 +1,6 @@
+1.0.15
+Added: Food stats to tooltip (only shown when shift is held by default)
+
 1.0.14
 Added: MCMultiPart support.
 Added: Config to offset the HUD, allowing the position to be fine-tuned.
