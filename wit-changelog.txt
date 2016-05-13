@@ -1,5 +1,7 @@
 1.0.15
 Added: Food stats to tooltip (only shown when shift is held by default)
+Added: Tool stats (harvest speed, max damage) to tooltip (only shown when shift is held by default)
+Fixed: Entity health display not rounding to one decimal place.
 
 1.0.14
 Added: MCMultiPart support.
