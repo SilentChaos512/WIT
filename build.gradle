@@ -7,23 +7,23 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.15"
+version = "1.0.16"
 group= "net.silentchaos512.wit" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "WIT-1.9"
+archivesBaseName = "WIT-1.9.4"
 
 minecraft {
-    version = "1.9-12.16.0.1865-1.9"
+    version = "1.9.4-12.17.0.1909-1.9.4"
     runDir = "eclipse"
     
     replace "@VERSION@", project.version
     replaceIn "WIT.java"
 
-    mappings = "snapshot_20160419"
+    mappings = "snapshot_20160518"
     useDepAts = true
 }
 

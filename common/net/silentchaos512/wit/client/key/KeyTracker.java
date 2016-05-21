@@ -3,6 +3,7 @@ package net.silentchaos512.wit.client.key;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -28,7 +29,7 @@ public class KeyTracker {
 
   public static void init() {
 
-    FMLCommonHandler.instance().bus().register(instance);
+    MinecraftForge.EVENT_BUS.register(instance);
   }
 
   @SubscribeEvent

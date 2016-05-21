@@ -201,9 +201,10 @@ public class WIT {
             }
           } else {
             // Might be able to get item dropped by block?
-            Item itemDrop = state.getBlock().getItemDropped(state, world.rand, 0);
+            // Was getItemDropped, this seems to fix the issue with doors and slabs, but not tall plants.
+            ItemStack itemDrop = state.getBlock().getPickBlock(state, mop, world, pos, mc.thePlayer);
             if (itemDrop != null) {
-              ItemStackInfo itemInfo = new ItemStackInfo(new ItemStack(itemDrop));
+              ItemStackInfo itemInfo = new ItemStackInfo(itemDrop);
               renderObject = new HudRenderObject(itemInfo);
             }
           }
