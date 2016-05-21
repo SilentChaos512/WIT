@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 
 public class WitHudInfoEvent extends WorldEvent {
@@ -13,11 +14,13 @@ public class WitHudInfoEvent extends WorldEvent {
   public final boolean isSneaking;
   public final boolean advanced;
   public final EntityPlayer player;
+  public final World world;
 
   public WitHudInfoEvent(EntityPlayer player, boolean advanced) {
 
     super(player.worldObj);
     this.player = player;
+    this.world = player.worldObj;
     this.isSneaking = player.isSneaking();
     this.advanced = advanced;
     this.lines = Lists.newArrayList();

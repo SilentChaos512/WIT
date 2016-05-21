@@ -2,6 +2,8 @@
 Added: Food stats to tooltip (only shown when shift is held by default)
 Added: Tool stats (harvest speed, max damage) to tooltip (only shown when shift is held by default)
 Fixed: Entity health display not rounding to one decimal place.
+(API) Added: tileEntity variable to WitBlockInfoEvent
+(API) Added: world variable to WitHudInfoEvent
 
 1.0.14
 Added: MCMultiPart support.
