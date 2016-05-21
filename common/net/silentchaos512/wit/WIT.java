@@ -192,6 +192,13 @@ public class WIT {
         BlockPos pos = mop.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         if (state.getBlock() != null && state.getBlock() != Blocks.AIR) {
+          // Sunflower bug fix
+          IBlockState stateDown = world.getBlockState(pos.down());
+          if (Config.enableSunflowerBugfix && state.getBlock() == Blocks.DOUBLE_PLANT
+              && stateDown.getBlock() == Blocks.DOUBLE_PLANT) {
+            state = stateDown;
+          }
+
           ItemStack blockStack = new ItemStack(state.getBlock());
           // In some cases, blocks have no item (example, lit redstone).
           if (blockStack.getItem() != null) {
@@ -202,7 +209,8 @@ public class WIT {
           } else {
             // Might be able to get item dropped by block?
             // Was getItemDropped, this seems to fix the issue with doors and slabs, but not tall plants.
-            ItemStack itemDrop = state.getBlock().getPickBlock(state, mop, world, pos, mc.thePlayer);
+            ItemStack itemDrop = state.getBlock().getPickBlock(state, mop, world, pos,
+                mc.thePlayer);
             if (itemDrop != null) {
               ItemStackInfo itemInfo = new ItemStackInfo(itemDrop);
               renderObject = new HudRenderObject(itemInfo);

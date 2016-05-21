@@ -1,5 +1,6 @@
 1.0.16
 Ported to 1.9.4.
+Fixed: The "sunflower bug".
 Fixed: Double slabs being reported incorrectly. Also fixes the upper half of doors, but not tall plants.
 
 1.0.15

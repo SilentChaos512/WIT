@@ -59,6 +59,7 @@ public class Config {
   public static boolean hudAdvancedMode = false;
   public static int hudInventoryMaxListCount = 8;
   public static boolean disguiseMonsterEggBlocks = true;
+  public static boolean enableSunflowerBugfix = true;
 
   /*
    * Tooltip display options
@@ -170,6 +171,9 @@ public class Config {
       disguiseMonsterEggBlocks = c.getBoolean("Disguise Monster Egg Blocks", CAT_HUD_DISPLAY,
           disguiseMonsterEggBlocks,
           "Show monster egg (silverfish) blocks as the blocks they look like in the HUD (requires restart)");
+      enableSunflowerBugfix = c.getBoolean("Enable Sunflower Bugfix", CAT_HUD_DISPLAY,
+          enableSunflowerBugfix,
+          "Fixes the 'sunflower bug', where the upper half of double plants are reported as sunflowers.");
 
       /*
        * Tooltip display options

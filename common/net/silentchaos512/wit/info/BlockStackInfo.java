@@ -3,9 +3,11 @@ package net.silentchaos512.wit.info;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class BlockStackInfo extends ItemStackInfo {
 
@@ -31,7 +33,7 @@ public class BlockStackInfo extends ItemStackInfo {
     this.pos = pos;
     block = newBlock;
     blockId = block.getIdFromBlock(block);
-//    meta = block.getMetaFromState(state);
+    // meta = block.getMetaFromState(state);
     tileEntity = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos);
     boolean metaIsGood = meta >= 0 && meta < 16;
     harvestTool = metaIsGood ? block.getHarvestTool(newState) : "null";
