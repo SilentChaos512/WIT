@@ -22,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -168,12 +169,7 @@ public class WIT {
     }
   }
 
-  @SubscribeEvent
-  public void onRenderOverlay(RenderGameOverlayEvent event) {
-
-    if (event.isCancelable() || event.getType() != RenderGameOverlayEvent.ElementType.TEXT) {
-      return;
-    }
+  public HudRenderObject getRenderObject() {
 
     Minecraft mc = Minecraft.getMinecraft();
     Entity renderViewEntity = mc.getRenderViewEntity();
@@ -225,6 +221,18 @@ public class WIT {
       }
     }
 
+    return renderObject;
+  }
+
+  @SubscribeEvent
+  public void onRenderOverlay(RenderGameOverlayEvent event) {
+
+    if (event.isCancelable() || event.getType() != RenderGameOverlayEvent.ElementType.TEXT) {
+      return;
+    }
+
+    HudRenderObject renderObject = getRenderObject();
+
     if (renderObject != null) {
       renderObject.render(event);
     } else {
@@ -232,6 +240,13 @@ public class WIT {
       HudRenderObject.renderBackground(HudRenderObject.lastMaxBackgroundWidth,
           HudRenderObject.lastBackgroundPosX, HudRenderObject.lastBackgroundPosY);
     }
+  }
+
+  @SubscribeEvent
+  public void onRenderWorldLastEvent(RenderWorldLastEvent event) {
+
+    //HudRenderObject renderObject = getRenderObject();
+    // TODO
   }
 
   public void populateBlockReplacements() {
