@@ -1,5 +1,6 @@
 1.0.17
 Added: wit:Tool.scoop to localization file (Forestry compat)
+Fixed: Some weirdness with the config file (invalidates current configs, deleting the file is recommended)
 
 1.0.16
 Ported to 1.9.4.

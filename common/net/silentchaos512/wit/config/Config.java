@@ -108,7 +108,7 @@ public class Config {
   public static void init(File file) {
 
     configFile = file;
-    c = new Configuration(file, true);
+    c = new Configuration(file);
     load();
   }
 
