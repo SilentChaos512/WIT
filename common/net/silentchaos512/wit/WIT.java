@@ -35,6 +35,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.client.HudRenderObject;
@@ -115,7 +116,7 @@ public class WIT {
     }
   }
 
-  @SubscribeEvent
+  @SubscribeEvent(priority = EventPriority.LOWEST)
   public void onTooltip(ItemTooltipEvent event) {
 
     ItemStackInfo itemInfo = new ItemStackInfo(event.getItemStack());

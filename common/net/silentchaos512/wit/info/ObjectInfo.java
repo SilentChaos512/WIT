@@ -1,9 +1,12 @@
 package net.silentchaos512.wit.info;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -12,8 +15,9 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
 import net.silentchaos512.wit.WIT;
+import net.silentchaos512.wit.api.IInfoObject;
 
-public class ObjectInfo {
+public class ObjectInfo implements IInfoObject {
 
   // Names
   public final String unlocalizedName;
@@ -94,5 +98,11 @@ public class ObjectInfo {
 
     ResourceLocation location = item.getRegistryName();
     return WIT.instance.mods.get(location.getResourceDomain());
+  }
+
+  @Override
+  public void addLines(EntityPlayer player, List<String> lines) {
+
+    // TODO Auto-generated method stub
   }
 }
