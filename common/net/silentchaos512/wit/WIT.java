@@ -120,35 +120,36 @@ public class WIT {
   public void onTooltip(ItemTooltipEvent event) {
 
     ItemStackInfo itemInfo = new ItemStackInfo(event.getItemStack());
+    ItemStack stack = itemInfo.getStack();
+    Item item = itemInfo.getItem();
 
     // ID & meta
     if (Config.tooltipDisplayIdMeta && !event.isShowAdvancedItemTooltips()) {
       String str = event.getToolTip().get(0);
-      str += " " + Item.getIdFromItem(itemInfo.stack.getItem()) + ":"
-          + itemInfo.stack.getItemDamage();
+      str += " " + Item.getIdFromItem(item) + ":" + stack.getItemDamage();
       event.getToolTip().set(0, str);
     }
 
     // Tool stats
-    if (shouldDipslayToolStats() && itemInfo.item instanceof ItemTool) {
-      ItemTool itemTool = (ItemTool) itemInfo.item;
+    if (shouldDipslayToolStats() && item instanceof ItemTool) {
+      ItemTool itemTool = (ItemTool) item;
       IBlockState state = getBlockForToolSpeed(itemTool);
       if (state != null) {
-        String str = String.format("%.1f", itemTool.getStrVsBlock(itemInfo.stack, state));
+        String str = String.format("%.1f", itemTool.getStrVsBlock(stack, state));
         str = String.format(LocalizationHelper.instance.get("ToolSpeed"), str);
         event.getToolTip().add(str);
       }
-      int maxDamage = itemTool.getMaxDamage(itemInfo.stack);
+      int maxDamage = itemTool.getMaxDamage(stack);
       String str = String.format(LocalizationHelper.instance.get("ToolMaxDamage"), maxDamage);
       event.getToolTip().add(str);
     }
 
     // Food stats
-    if (shouldDisplayFoodStats() && itemInfo.item instanceof ItemFood) {
-      ItemFood itemFood = (ItemFood) itemInfo.item;
+    if (shouldDisplayFoodStats() && item instanceof ItemFood) {
+      ItemFood itemFood = (ItemFood) item;
       String str = "%d (%.1f)";
-      str = String.format(str, itemFood.getHealAmount(itemInfo.stack),
-          itemFood.getSaturationModifier(itemInfo.stack));
+      str = String.format(str, itemFood.getHealAmount(stack),
+          itemFood.getSaturationModifier(stack));
       str = String.format(LocalizationHelper.instance.get("Food"), str);
       event.getToolTip().add(str);
     }
@@ -166,7 +167,8 @@ public class WIT {
 
     // Mod name
     if (shouldDisplayModName()) {
-      event.getToolTip().add(Config.formatModName.replaceAll("&", "\u00a7") + itemInfo.modName);
+      event.getToolTip()
+          .add(Config.formatModName.replaceAll("&", "\u00a7") + itemInfo.getModName());
     }
   }
 
@@ -200,7 +202,7 @@ public class WIT {
           // In some cases, blocks have no item (example, lit redstone).
           if (blockStack.getItem() != null) {
             BlockStackInfo blockInfo = new BlockStackInfo(state, pos);
-            if (blockInfo.block != Blocks.AIR && blockInfo.item != null) {
+            if (blockInfo.getBlock() != Blocks.AIR && blockInfo.getItem() != null) {
               renderObject = new HudRenderObject(blockInfo);
             }
           } else {
@@ -246,7 +248,7 @@ public class WIT {
   @SubscribeEvent
   public void onRenderWorldLastEvent(RenderWorldLastEvent event) {
 
-    //HudRenderObject renderObject = getRenderObject();
+    // HudRenderObject renderObject = getRenderObject();
     // TODO
   }
 

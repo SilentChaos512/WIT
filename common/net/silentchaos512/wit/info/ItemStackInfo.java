@@ -6,6 +6,8 @@ import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,14 +19,17 @@ import net.silentchaos512.wit.config.Config;
 
 public class ItemStackInfo extends ObjectInfo {
 
-  public final ResourceLocation resourceLocation;
+  protected ResourceLocation resourceLocation;
 
   // Item
-  public final Item item;
-  public final ItemStack stack;
+  @Getter(value = AccessLevel.PUBLIC)
+  Item item;
+  @Getter(value = AccessLevel.PUBLIC)
+  ItemStack stack;
 
   // Names
-  public final String itemName;
+  @Getter(value = AccessLevel.PUBLIC)
+  String itemName;
 
   public ItemStackInfo(@Nonnull ItemStack stack) {
 

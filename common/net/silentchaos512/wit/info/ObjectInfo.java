@@ -4,13 +4,15 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
@@ -20,13 +22,18 @@ import net.silentchaos512.wit.api.IInfoObject;
 public class ObjectInfo implements IInfoObject {
 
   // Names
-  public final String unlocalizedName;
-  public final String localizedName;
+  @Getter(value = AccessLevel.PUBLIC)
+  String unlocalizedName;
+  @Getter(value = AccessLevel.PUBLIC)
+  String localizedName;
 
   // Mod
-  public final String modId;
-  public final String modName;
-  public final ModContainer mod;
+  @Getter(value = AccessLevel.PUBLIC)
+  protected String modId;
+  @Getter(value = AccessLevel.PUBLIC)
+  protected String modName;
+  @Getter(value = AccessLevel.PUBLIC)
+  protected ModContainer mod;
 
   public ObjectInfo(ModContainer mod, String unlocalizedName) {
 
@@ -40,7 +47,7 @@ public class ObjectInfo implements IInfoObject {
     }
 
     this.unlocalizedName = unlocalizedName;
-    this.localizedName = I18n.translateToLocal(unlocalizedName + ".name");
+    this.localizedName = I18n.format(unlocalizedName + ".name");
   }
 
   public ObjectInfo(ModContainer mod, Entity entity) {
@@ -69,6 +76,10 @@ public class ObjectInfo implements IInfoObject {
   public ObjectInfo(@Nonnull ItemStack stack) {
 
     this(getModFromItem(stack), stack.getItem().getUnlocalizedName(stack));
+
+    if (localizedName.equals(unlocalizedName + ".name")) {
+      localizedName = stack.getDisplayName();
+    }
   }
 
   public static ModContainer getModFromEntity(Entity entity) {

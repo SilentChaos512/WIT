@@ -6,6 +6,8 @@ import com.google.common.collect.Lists;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -30,14 +32,22 @@ import net.silentchaos512.wit.lib.LocalizationHelper;
 public class BlockStackInfo extends ItemStackInfo {
 
   // Block
-  public final IBlockState state;
-  public final BlockPos pos;
-  public final Block block;
-  public final int blockId;
-  public final int meta;
-  public final TileEntity tileEntity;
-  public final String harvestTool;
-  public final int harvestLevel;
+  @Getter(value = AccessLevel.PUBLIC)
+  IBlockState state;
+  @Getter(value = AccessLevel.PUBLIC)
+  BlockPos pos;
+  @Getter(value = AccessLevel.PUBLIC)
+  Block block;
+  @Getter(value = AccessLevel.PUBLIC)
+  int blockId;
+  @Getter(value = AccessLevel.PUBLIC)
+  int meta;
+  @Getter(value = AccessLevel.PUBLIC)
+  TileEntity tileEntity;
+  @Getter(value = AccessLevel.PUBLIC)
+  String harvestTool;
+  @Getter(value = AccessLevel.PUBLIC)
+  int harvestLevel;
 
   public BlockStackInfo(IBlockState state, BlockPos pos) {
 

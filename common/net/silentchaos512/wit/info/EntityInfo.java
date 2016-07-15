@@ -13,7 +13,7 @@ import net.silentchaos512.wit.lib.LocalizationHelper;
 
 public class EntityInfo extends ObjectInfo {
 
-  public final Entity entity;
+  protected Entity entity;
 
   public EntityInfo(Entity entity) {
 
