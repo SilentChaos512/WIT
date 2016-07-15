@@ -57,6 +57,7 @@ public class Config {
   public static float hudOffsetX = 0.0f;
   public static float hudOffsetY = 0.0f;
   public static boolean hudAdvancedMode = false;
+  public static boolean hudHideWhenGuiOpen = true;
   public static int hudInventoryMaxListCount = 8;
   public static boolean disguiseMonsterEggBlocks = true;
   public static boolean enableSunflowerBugfix = true;
@@ -124,6 +125,8 @@ public class Config {
 
       hudAdvancedMode = c.getBoolean("Advanced Mode", CAT_HUD, hudAdvancedMode,
           "Display additional information in HUD that may not be especially useful to most players.");
+      hudHideWhenGuiOpen = c.getBoolean("Hide When GUI Is Open", CAT_HUD, hudHideWhenGuiOpen,
+          "Hide the HUD when a GUI is open. The HUD will still remain visible if the GUI pauses the game.");
 
       /*
        * HUD display positioning

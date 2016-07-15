@@ -1,4 +1,5 @@
 1.0.18
+Changed: HUD will now be hidden (by default) when a GUI that does not pause the game is open.
 Changed: Harvest level is no longer displayed if it is zero.
 Fixed: Some blocks not displaying their name (notable offenders include Botania and Forestry)
 Some internal refactoring. Should have no impact on the way the mod works, but makes the code a bit easier to understand.

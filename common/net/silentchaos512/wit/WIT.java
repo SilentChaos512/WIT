@@ -9,6 +9,8 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -231,6 +233,11 @@ public class WIT {
   public void onRenderOverlay(RenderGameOverlayEvent event) {
 
     if (event.isCancelable() || event.getType() != RenderGameOverlayEvent.ElementType.TEXT) {
+      return;
+    }
+
+    GuiScreen screen = Minecraft.getMinecraft().currentScreen;
+    if (screen != null && !screen.doesGuiPauseGame() && Config.hudHideWhenGuiOpen) {
       return;
     }
 
