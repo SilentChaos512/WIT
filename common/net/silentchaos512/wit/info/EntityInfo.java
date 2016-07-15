@@ -36,10 +36,9 @@ public class EntityInfo extends ObjectInfo {
     if (entity instanceof EntityLiving) {
       EntityLiving entityLiving = (EntityLiving) entity;
       if (Config.hudEntityHealth.shouldDisplay(player)) {
-        line = LocalizationHelper.instance.get("EntityHealth");
         String current = String.format("%.1f", entityLiving.getHealth());
         String max = String.format("%.1f", entityLiving.getMaxHealth());
-        lines.add(String.format(line, current, max));
+        lines.add(LocalizationHelper.instance.get("EntityHealth", current, max));
       }
     }
 
