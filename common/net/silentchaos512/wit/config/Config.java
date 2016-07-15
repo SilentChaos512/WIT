@@ -34,7 +34,7 @@ public class Config {
       "Resource Name", true, true, "&7")
       .setComment("Display the resource name in the HUD. Example: minecraft:stone.");
   public static ConfigOptionHudElement hudModName = new ConfigOptionHudElement(
-      "Mod Name", true, false, "&e")
+      "Mod Name", true, false, "&5")
       .setComment("Display the mod name in the HUD. Example: Minecraft");
   public static ConfigOptionHudElement hudIdMeta = new ConfigOptionHudElement(
       "ID and Meta", true, true, "&o")
@@ -88,7 +88,7 @@ public class Config {
    * Formatting
    */
 
-  public static String formatModName = "&e";
+  public static String formatModName = "&5";
   // Originally: The formatting codes to use in the tooltip. Use & to substitute for the control character.
   public static String formatModNameComment = "Formatting for mod names.";
   public static String formatResourceName = "&7";

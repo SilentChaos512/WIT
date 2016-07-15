@@ -1,6 +1,7 @@
 1.0.18
 Changed: Harvest level is no longer displayed if it is zero.
-Some internal refactoring. Should have no impact on the way the mod works, but makes things a bit easier to understand.
+Fixed: Some blocks not displaying their name (notable offenders include Botania and Forestry)
+Some internal refactoring. Should have no impact on the way the mod works, but makes the code a bit easier to understand.
 
 1.0.17
 Added: wit:Tool.scoop to localization file (Forestry compat)
