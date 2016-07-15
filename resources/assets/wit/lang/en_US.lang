@@ -1,4 +1,5 @@
-wit:HarvestWith=Harvest with: %s (level %d)
+wit:HarvestWith=Harvest with: %s
+wit:HarvestLevel= (level %d)
 wit:Harvestable=Harvestable
 wit:NotHarvestable=Not Harvestable
 wit:Tool.pickaxe=Pickaxe

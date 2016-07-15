@@ -188,10 +188,12 @@ public class BlockStackInfo extends ItemStackInfo {
 
     String line;
     if (harvestTool != null && !harvestTool.isEmpty() && harvestLevel > -1) {
-      line = loc.get("HarvestWith");
-      String tool = loc.get("Tool." + harvestTool);
-      line = String.format(line, tool, harvestLevel);
+      // Known tool
+      String strTool = loc.get("Tool." + harvestTool);
+      String strLevel = harvestLevel > 0 ? loc.get("HarvestLevel", harvestLevel) : "";
+      line = loc.get("HarvestWith", strTool) + strLevel;
     } else {
+      // Unknown tool or level, but we know whether or not it can be harvested.
       line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
     }
     lines.add(format + line);

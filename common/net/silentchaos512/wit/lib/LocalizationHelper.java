@@ -1,6 +1,6 @@
 package net.silentchaos512.wit.lib;
 
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.client.resources.I18n;
 
 public class LocalizationHelper {
 
@@ -13,8 +13,8 @@ public class LocalizationHelper {
     instance = new LocalizationHelper();
   }
 
-  public String get(String key) {
+  public String get(String key, Object... params) {
 
-    return I18n.translateToLocal(prefix + key);
+    return I18n.format(prefix + key, params);
   }
 }
