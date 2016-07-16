@@ -39,7 +39,7 @@ public class ItemStackInfo extends ObjectInfo {
     item = this.stack.getItem();
 
     if (item != null) {
-      resourceLocation = (ResourceLocation) GameData.getItemRegistry().getNameForObject(item);
+      resourceLocation = Item.REGISTRY.getNameForObject(item);
       itemName = resourceLocation.getResourcePath();
     } else {
       resourceLocation = null;
