@@ -152,7 +152,7 @@ public class WIT {
       String str = "%d (%.1f)";
       str = String.format(str, itemFood.getHealAmount(stack),
           itemFood.getSaturationModifier(stack));
-      str = String.format(LocalizationHelper.instance.get("Food"), str);
+      str = LocalizationHelper.instance.get("Food", str);
       event.getToolTip().add(str);
     }
 

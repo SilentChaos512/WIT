@@ -162,8 +162,8 @@ public class BlockStackInfo extends ItemStackInfo {
       // How many did we not display?
       int omittedCount = invStacks.size() - Config.hudInventoryMaxListCount;
       if (omittedCount > 0) {
-        String str2 = LocalizationHelper.instance.get("OmittedInventoryItems");
-        lines.add(String.format(str2, omittedCount));
+        String str2 = LocalizationHelper.instance.get("OmittedInventoryItems", omittedCount);
+        lines.add(str2);
       }
     }
   }
