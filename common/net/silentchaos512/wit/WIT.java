@@ -138,11 +138,11 @@ public class WIT {
       IBlockState state = getBlockForToolSpeed(itemTool);
       if (state != null) {
         String str = String.format("%.1f", itemTool.getStrVsBlock(stack, state));
-        str = String.format(LocalizationHelper.instance.get("ToolSpeed"), str);
+        str = LocalizationHelper.instance.get("ToolSpeed", str);
         event.getToolTip().add(str);
       }
       int maxDamage = itemTool.getMaxDamage(stack);
-      String str = String.format(LocalizationHelper.instance.get("ToolMaxDamage"), maxDamage);
+      String str = LocalizationHelper.instance.get("ToolMaxDamage", maxDamage);
       event.getToolTip().add(str);
     }
 
@@ -307,6 +307,7 @@ public class WIT {
     } else if (itemTool instanceof ItemAxe) {
       return Blocks.LOG.getDefaultState();
     }
-    return null;
+    // Weird generic tool. Naively assume it can mine stone.
+    return Blocks.STONE.getDefaultState();
   }
 }
