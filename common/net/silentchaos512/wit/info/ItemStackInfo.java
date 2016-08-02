@@ -40,7 +40,7 @@ public class ItemStackInfo extends ObjectInfo {
 
     if (item != null) {
       resourceLocation = Item.REGISTRY.getNameForObject(item);
-      itemName = resourceLocation.getResourcePath();
+      itemName = resourceLocation != null ? resourceLocation.getResourcePath() : "null";
     } else {
       resourceLocation = null;
       itemName = "null";
