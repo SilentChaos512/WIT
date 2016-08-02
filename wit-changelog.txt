@@ -1,3 +1,10 @@
+1.0.20
+Added: An extra case for entity names (support for 'Minecraft Comes Alive')
+
+1.0.19
+Fixed: A crash in 1.10.x when mousing over items and probably certain blocks (#12)
+Fixed: Format errors in tooltips.
+
 1.0.18
 Changed: HUD will now be hidden (by default) when a GUI that does not pause the game is open.
 Changed: Harvest level is no longer displayed if it is zero.

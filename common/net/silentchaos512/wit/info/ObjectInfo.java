@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
@@ -64,8 +65,14 @@ public class ObjectInfo implements IInfoObject {
     String entityString = EntityList.getEntityString(entity);
     this.unlocalizedName = entityString == null || entityString.isEmpty() ? "unknown"
         : entityString;
-    this.localizedName = entity.getDisplayName() != null
-        ? entity.getDisplayName().getUnformattedComponentText() : unlocalizedName;
+
+    ITextComponent dispName = entity.getDisplayName();
+    if (dispName != null && !dispName.getUnformattedComponentText().isEmpty())
+      this.localizedName = dispName.getUnformattedComponentText();
+    else if (entity.getName() != null && !entity.getName().isEmpty())
+      this.localizedName = entity.getName();
+    else
+      this.localizedName = unlocalizedName;
   }
 
   public ObjectInfo(Entity entity) {
