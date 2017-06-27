@@ -2,27 +2,24 @@ package net.silentchaos512.wit.info;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
 import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.IFluidTank;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.api.IWitHudInfo;
 import net.silentchaos512.wit.api.WitBlockInfoEvent;
@@ -32,21 +29,13 @@ import net.silentchaos512.wit.lib.LocalizationHelper;
 public class BlockStackInfo extends ItemStackInfo {
 
   // Block
-  @Getter(value = AccessLevel.PUBLIC)
   IBlockState state;
-  @Getter(value = AccessLevel.PUBLIC)
   BlockPos pos;
-  @Getter(value = AccessLevel.PUBLIC)
   Block block;
-  @Getter(value = AccessLevel.PUBLIC)
   int blockId;
-  @Getter(value = AccessLevel.PUBLIC)
   int meta;
-  @Getter(value = AccessLevel.PUBLIC)
   TileEntity tileEntity;
-  @Getter(value = AccessLevel.PUBLIC)
   String harvestTool;
-  @Getter(value = AccessLevel.PUBLIC)
   int harvestLevel;
 
   public BlockStackInfo(IBlockState state, BlockPos pos) {
@@ -62,7 +51,7 @@ public class BlockStackInfo extends ItemStackInfo {
     block = newBlock;
     blockId = block.getIdFromBlock(block);
     // meta = block.getMetaFromState(state);
-    tileEntity = Minecraft.getMinecraft().thePlayer.worldObj.getTileEntity(pos);
+    tileEntity = Minecraft.getMinecraft().player.world.getTileEntity(pos);
     boolean metaIsGood = meta >= 0 && meta < 16;
     harvestTool = metaIsGood ? block.getHarvestTool(newState) : "null";
     harvestLevel = metaIsGood ? block.getHarvestLevel(newState) : -1;
@@ -86,6 +75,8 @@ public class BlockStackInfo extends ItemStackInfo {
 
     // Inventory?
     getLinesForBlockInventory(isIInventory, isIWitHudInfo, player, lines);
+    // Tank?
+    getLinesForTank(lines);
     // Mob spawner?
     getLinesForMobSpawner(lines);
     // RF storage?
@@ -148,15 +139,13 @@ public class BlockStackInfo extends ItemStackInfo {
       // Display first n items according to config setting.
       for (int i = 0; i < invStacks.size() && i < Config.hudInventoryMaxListCount; ++i) {
         ItemStack stack = invStacks.get(i);
-        if (stack != null) {
-          try {
-            int count = stack.stackSize;
-            String name = stack.getDisplayName();
-            lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
-          } catch (Exception ex) {
-            // Looks like a mod has done something stupid with their items...
-            lines.add(TextFormatting.RED + "<I AM ERROR!>");
-          }
+        try {
+          int count = stack.getCount();
+          String name = stack.getDisplayName();
+          lines.add(Config.hudBlockInventory.formatString(String.format(str, name, count)));
+        } catch (Exception ex) {
+          // Looks like a mod has done something stupid with their items...
+          lines.add(TextFormatting.RED + "<I AM ERROR!>");
         }
       }
       // How many did we not display?
@@ -168,15 +157,14 @@ public class BlockStackInfo extends ItemStackInfo {
     }
   }
 
-  public List<ItemStack> getInventoryStacks(IInventory inv) {
+  public NonNullList<ItemStack> getInventoryStacks(IInventory inv) {
 
-    List<ItemStack> list = Lists.newArrayList();
+    NonNullList<ItemStack> list = NonNullList.create();
     ItemStack stack;
     for (int i = 0; i < inv.getSizeInventory(); ++i) {
       stack = inv.getStackInSlot(i);
-      if (stack != null) {
+      if (!stack.isEmpty())
         list.add(stack);
-      }
     }
     return list;
   }
@@ -189,10 +177,10 @@ public class BlockStackInfo extends ItemStackInfo {
 
     LocalizationHelper loc = LocalizationHelper.instance;
 
-    Block actualBlock = player.worldObj.getBlockState(pos).getBlock();
+    Block actualBlock = player.world.getBlockState(pos).getBlock();
     boolean canHarvest = meta >= 0 && meta < 16 // Bad metadata check
-        && ForgeHooks.canHarvestBlock(actualBlock, player, player.worldObj, pos)
-        && state.getBlockHardness(player.worldObj, pos) >= 0;
+        && ForgeHooks.canHarvestBlock(actualBlock, player, player.world, pos)
+        && state.getBlockHardness(player.world, pos) >= 0;
     String format = canHarvest ? Config.hudHarvestable.formatString("")
         : Config.hudHarvestable.formatString2("");
 
@@ -207,6 +195,16 @@ public class BlockStackInfo extends ItemStackInfo {
       line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
     }
     lines.add(format + line);
+  }
+
+  public void getLinesForTank(List<String> lines) {
+
+    if (tileEntity instanceof IFluidTank) {
+      IFluidTank tank = (IFluidTank) tileEntity;
+      int amount = tank.getFluidAmount();
+      int capacity = tank.getCapacity();
+      lines.add(LocalizationHelper.instance.get("TankStorage", amount, capacity));
+    }
   }
 
   public void getLinesForMobSpawner(List<String> lines) {
@@ -231,5 +229,45 @@ public class BlockStackInfo extends ItemStackInfo {
     // str = String.format(str, current, max);
     // lines.add(str);
     // }
+  }
+
+  public IBlockState getState() {
+
+    return state;
+  }
+
+  public BlockPos getPos() {
+
+    return pos;
+  }
+
+  public Block getBlock() {
+
+    return block;
+  }
+
+  public int getBlockId() {
+
+    return blockId;
+  }
+
+  public int getMeta() {
+
+    return meta;
+  }
+
+  public TileEntity getTileEntity() {
+
+    return tileEntity;
+  }
+
+  public String getHarvestTool() {
+
+    return harvestTool;
+  }
+
+  public int getHarvestLevel() {
+
+    return harvestLevel;
   }
 }

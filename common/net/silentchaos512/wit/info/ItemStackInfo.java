@@ -6,13 +6,10 @@ import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.oredict.OreDictionary;
 import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.config.Config;
@@ -22,13 +19,11 @@ public class ItemStackInfo extends ObjectInfo {
   protected ResourceLocation resourceLocation;
 
   // Item
-  @Getter(value = AccessLevel.PUBLIC)
   Item item;
-  @Getter(value = AccessLevel.PUBLIC)
+  @Nonnull
   ItemStack stack;
 
   // Names
-  @Getter(value = AccessLevel.PUBLIC)
   String itemName;
 
   public ItemStackInfo(@Nonnull ItemStack stack) {
@@ -76,5 +71,20 @@ public class ItemStackInfo extends ObjectInfo {
     if (Config.hudModName.shouldDisplay(player)) {
       lines.add(Config.hudModName.formatString(modName));
     }
+  }
+
+  public Item getItem() {
+
+    return item;
+  }
+
+  public ItemStack getStack() {
+
+    return stack;
+  }
+
+  public String getItemName() {
+
+    return itemName;
   }
 }

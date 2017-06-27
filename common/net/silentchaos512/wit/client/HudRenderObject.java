@@ -66,9 +66,9 @@ public class HudRenderObject {
   List<String> lines = Lists.newArrayList();
 
   Minecraft mc = Minecraft.getMinecraft();
-  EntityPlayer player = mc.thePlayer;
+  EntityPlayer player = mc.player;
   FontRenderer fontRender = mc.fontRendererObj;
-  boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
+  boolean sneaking = Minecraft.getMinecraft().player.isSneaking();
 
   public HudRenderObject(IInfoObject info) {
 
@@ -83,7 +83,7 @@ public class HudRenderObject {
 
     // Get text
     if (info != null) {
-      info.addLines(Minecraft.getMinecraft().thePlayer, lines);
+      info.addLines(Minecraft.getMinecraft().player, lines);
     }
 
     ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());

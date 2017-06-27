@@ -1,5 +1,6 @@
 1.0.20
 Added: An extra case for entity names (support for 'Minecraft Comes Alive')
+Fixed: Another item tooltip crash.
 
 1.0.19
 Fixed: A crash in 1.10.x when mousing over items and probably certain blocks (#12)

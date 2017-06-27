@@ -46,7 +46,7 @@ public class MultipartInfo implements IInfoObject {
 
         String line = Config.hudObjectName.shouldDisplay(player)
             ? stack.getRarity().rarityColor + stack.getDisplayName() : "";
-        TileEntity tile = player.worldObj.getTileEntity(mop.getBlockPos());
+        TileEntity tile = player.world.getTileEntity(mop.getBlockPos());
         if (tile != null) {
           line += Config.hudTileEntity.formatString(" (TE)");
         }

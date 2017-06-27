@@ -28,8 +28,8 @@ public class EntityInfo extends ObjectInfo {
 
     // Entity name
     line = Config.hudObjectName.shouldDisplay(player) ? localizedName : "";
-    line += Config.hudIdMeta.shouldDisplay(player)
-        ? Config.hudIdMeta.formatString(" [" + EntityList.getEntityID(entity) + "]") : "";
+//    line += Config.hudIdMeta.shouldDisplay(player) ? Config.hudIdMeta.formatString(
+//        " [" + EntityList.field_191308_b.getIDForObject(entity.getClass()) + "]") : "";
     lines.add(line);
 
     // Health
