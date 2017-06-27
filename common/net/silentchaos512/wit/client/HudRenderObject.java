@@ -5,37 +5,19 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawer;
-import com.jaquadro.minecraft.storagedrawers.api.storage.IDrawerGroup;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityMobSpawner;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.api.IInfoObject;
-import net.silentchaos512.wit.api.IWitHudInfo;
-import net.silentchaos512.wit.api.WitBlockInfoEvent;
-import net.silentchaos512.wit.api.WitEntityInfoEvent;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
@@ -66,9 +48,9 @@ public class HudRenderObject {
   List<String> lines = Lists.newArrayList();
 
   Minecraft mc = Minecraft.getMinecraft();
-  EntityPlayer player = mc.thePlayer;
-  FontRenderer fontRender = mc.fontRendererObj;
-  boolean sneaking = Minecraft.getMinecraft().thePlayer.isSneaking();
+  EntityPlayer player = mc.player;
+  FontRenderer fontRender = mc.fontRenderer;
+  boolean sneaking = Minecraft.getMinecraft().player.isSneaking();
 
   public HudRenderObject(IInfoObject info) {
 
@@ -83,7 +65,7 @@ public class HudRenderObject {
 
     // Get text
     if (info != null) {
-      info.addLines(Minecraft.getMinecraft().thePlayer, lines);
+      info.addLines(Minecraft.getMinecraft().player, lines);
     }
 
     ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
@@ -155,7 +137,7 @@ public class HudRenderObject {
     GL11.glColor4f(1f, 1f, 1f, Config.hudBackgroundOpacity);
 
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer vbuffer = tessellator.getBuffer();
+    BufferBuilder vbuffer = tessellator.getBuffer();
     vbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
     vbuffer.pos(x, y + height, 0).tex(0, 1).endVertex();
     vbuffer.pos(x + width, y + height, 0).tex(1, 1).endVertex();

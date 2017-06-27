@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.util.ITooltipFlag.TooltipFlags;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -55,13 +56,15 @@ import net.silentchaos512.wit.proxy.CommonProxy;
     version = WIT.VERSION_NUMBER,
     clientSideOnly = true,
     guiFactory = "net.silentchaos512.wit.gui.GuiFactoryWit",
+    dependencies = WIT.DEPENDENCIES,
     updateJSON = "https://raw.githubusercontent.com/SilentChaos512/WIT/master/update.json")
 //@formatter:on
 public class WIT {
 
-  public static final String MOD_ID = "WIT";
+  public static final String MOD_ID = "wit";
   public static final String MOD_NAME = "WIT";
   public static final String VERSION_NUMBER = "@VERSION@";
+  public static final String DEPENDENCIES = "required-after:forge@[13.19.0.2156,);";
 
   public static Logger logger = LogManager.getLogger(MOD_NAME);
 
@@ -125,7 +128,7 @@ public class WIT {
     Item item = itemInfo.getItem();
 
     // ID & meta
-    if (Config.tooltipDisplayIdMeta && !event.isShowAdvancedItemTooltips()) {
+    if (Config.tooltipDisplayIdMeta && event.getFlags() != TooltipFlags.ADVANCED) {
       String str = event.getToolTip().get(0);
       str += " " + Item.getIdFromItem(item) + ":" + stack.getItemDamage();
       event.getToolTip().set(0, str);
@@ -177,7 +180,7 @@ public class WIT {
 
     Minecraft mc = Minecraft.getMinecraft();
     Entity renderViewEntity = mc.getRenderViewEntity();
-    World world = renderViewEntity.worldObj;
+    World world = renderViewEntity.world;
 
     HudRenderObject renderObject = null;
 
@@ -210,7 +213,7 @@ public class WIT {
             // Might be able to get item dropped by block?
             // Was getItemDropped, this seems to fix the issue with doors and slabs, but not tall plants.
             ItemStack itemDrop = state.getBlock().getPickBlock(state, mop, world, pos,
-                mc.thePlayer);
+                mc.player);
             if (itemDrop != null) {
               ItemStackInfo itemInfo = new ItemStackInfo(itemDrop);
               renderObject = new HudRenderObject(itemInfo);

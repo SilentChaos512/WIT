@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -23,17 +21,12 @@ import net.silentchaos512.wit.api.IInfoObject;
 public class ObjectInfo implements IInfoObject {
 
   // Names
-  @Getter(value = AccessLevel.PUBLIC)
   String unlocalizedName;
-  @Getter(value = AccessLevel.PUBLIC)
   String localizedName;
 
   // Mod
-  @Getter(value = AccessLevel.PUBLIC)
   protected String modId;
-  @Getter(value = AccessLevel.PUBLIC)
   protected String modName;
-  @Getter(value = AccessLevel.PUBLIC)
   protected ModContainer mod;
 
   public ObjectInfo(ModContainer mod, String unlocalizedName) {
@@ -122,5 +115,30 @@ public class ObjectInfo implements IInfoObject {
   public void addLines(EntityPlayer player, List<String> lines) {
 
     // TODO Auto-generated method stub
+  }
+
+  public String getUnlocalizedName() {
+
+    return unlocalizedName;
+  }
+
+  public String getLocalizedName() {
+
+    return localizedName;
+  }
+
+  public String getModId() {
+
+    return modId;
+  }
+
+  public String getModName() {
+
+    return modName;
+  }
+
+  public ModContainer getMod() {
+
+    return mod;
   }
 }

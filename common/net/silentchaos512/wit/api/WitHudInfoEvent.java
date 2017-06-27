@@ -18,9 +18,9 @@ public class WitHudInfoEvent extends WorldEvent {
 
   public WitHudInfoEvent(EntityPlayer player, boolean advanced) {
 
-    super(player.worldObj);
+    super(player.world);
     this.player = player;
-    this.world = player.worldObj;
+    this.world = player.world;
     this.isSneaking = player.isSneaking();
     this.advanced = advanced;
     this.lines = Lists.newArrayList();

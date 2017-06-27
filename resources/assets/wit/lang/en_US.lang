@@ -11,4 +11,5 @@ wit:ToolMaxDamage=Max damage: %s
 wit:Food=Food: %s
 wit:OmittedInventoryItems=Plus %d more...
 wit:RFStorage=%,d / %,d RF
+wit:TankStorage=&,d / &,d mB
 wit:EntityHealth=HP: %s / %s
