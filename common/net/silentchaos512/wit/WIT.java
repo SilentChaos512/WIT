@@ -99,7 +99,6 @@ public class WIT {
   public void init(FMLInitializationEvent event) {
 
     proxy.init();
-    LocalizationHelper.init();
     Config.save();
   }
 

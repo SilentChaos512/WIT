@@ -6,12 +6,7 @@ public class LocalizationHelper {
 
   String prefix = "wit:";
 
-  public static LocalizationHelper instance;
-
-  public static void init() {
-
-    instance = new LocalizationHelper();
-  }
+  public static LocalizationHelper instance = new LocalizationHelper();
 
   public String get(String key, Object... params) {
 
