@@ -5,11 +5,13 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
+import com.jaquadro.minecraft.storagedrawers.config.ConfigManager.ConfigSection;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
@@ -132,6 +134,9 @@ public class HudRenderObject {
     double width = maxWidth + 2 * BACKGROUND_PADDING;
     double height = backgroundHeight;
 
+    GlStateManager.pushMatrix();
+    GlStateManager.enableBlend();
+
     Minecraft.getMinecraft().renderEngine
         .bindTexture(new ResourceLocation(WIT.MOD_ID, "textures/background.png"));
     GL11.glColor4f(1f, 1f, 1f, Config.hudBackgroundOpacity);
@@ -139,11 +144,14 @@ public class HudRenderObject {
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilder vbuffer = tessellator.getBuffer();
     vbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+//    vbuffer.putColorRGBA(255, 255, 255, (int) (255 * Config.hudBackgroundOpacity));
     vbuffer.pos(x, y + height, 0).tex(0, 1).endVertex();
     vbuffer.pos(x + width, y + height, 0).tex(1, 1).endVertex();
     vbuffer.pos(x + width, y, 0).tex(1, 0).endVertex();
     vbuffer.pos(x, y, 0).tex(0, 0).endVertex();
     tessellator.draw();
+
+    GlStateManager.popMatrix();
   }
 
   public int getWidth() {
