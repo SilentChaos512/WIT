@@ -13,16 +13,15 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.IFluidTank;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.api.IWitHudInfo;
 import net.silentchaos512.wit.api.WitBlockInfoEvent;
@@ -84,8 +83,14 @@ public class BlockStackInfo extends ItemStackInfo {
     }
     lines.add(line);
 
+    if (!nameException.isEmpty()) {
+      lines.add(nameException);
+    }
+
     // Inventory?
     getLinesForBlockInventory(isIInventory, isIWitHudInfo, player, lines);
+    // Tank?
+    getLinesForTank(lines);
     // Mob spawner?
     getLinesForMobSpawner(lines);
     // RF storage?
@@ -207,6 +212,16 @@ public class BlockStackInfo extends ItemStackInfo {
       line = loc.get((canHarvest ? "" : "Not") + "Harvestable");
     }
     lines.add(format + line);
+  }
+  
+  public void getLinesForTank(List<String> lines) {
+
+    if (tileEntity instanceof IFluidTank) {
+      IFluidTank tank = (IFluidTank) tileEntity;
+      int amount = tank.getFluidAmount();
+      int capacity = tank.getCapacity();
+      lines.add(LocalizationHelper.instance.get("TankStorage", amount, capacity));
+    }
   }
 
   public void getLinesForMobSpawner(List<String> lines) {

@@ -66,6 +66,10 @@ public class ItemStackInfo extends ObjectInfo {
         .formatString(" [" + Item.getIdFromItem(item) + ":" + stack.getItemDamage() + "]") : "";
     lines.add(line);
 
+    if (!nameException.isEmpty()) {
+      lines.add(nameException);
+    }
+
     // Full (resource) name
     if (Config.hudResourceName.shouldDisplay(player)) {
       lines.add(

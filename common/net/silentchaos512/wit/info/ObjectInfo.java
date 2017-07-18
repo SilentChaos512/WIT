@@ -27,6 +27,7 @@ public class ObjectInfo implements IInfoObject {
   String unlocalizedName;
   @Getter(value = AccessLevel.PUBLIC)
   String localizedName;
+  protected String nameException = "";
 
   // Mod
   @Getter(value = AccessLevel.PUBLIC)
@@ -49,6 +50,7 @@ public class ObjectInfo implements IInfoObject {
 
     this.unlocalizedName = unlocalizedName;
     this.localizedName = I18n.format(unlocalizedName + ".name");
+    this.nameException = lastNameException;
   }
 
   public ObjectInfo(ModContainer mod, Entity entity) {
@@ -82,10 +84,30 @@ public class ObjectInfo implements IInfoObject {
 
   public ObjectInfo(@Nonnull ItemStack stack) {
 
-    this(getModFromItem(stack), stack.getItem().getUnlocalizedName(stack));
+    this(getModFromItem(stack), safeGetUnlocalizedName(stack));
 
     if (localizedName.equals(unlocalizedName + ".name")) {
-      localizedName = stack.getDisplayName();
+      try {
+        localizedName = stack.getDisplayName();
+        lastNameException = "";
+      } catch (Exception ex) {
+        lastNameException = ex.getClass().getName();
+        localizedName = "Broken Name";
+      }
+    }
+  }
+
+  private static String lastNameException = "";
+
+  protected static String safeGetUnlocalizedName(@Nonnull ItemStack stack) {
+
+    try {
+      String str = stack.getItem().getUnlocalizedName(stack);
+      lastNameException = "";
+      return str;
+    } catch (Exception ex) {
+      lastNameException = ex.getClass().getName();
+      return "Broken Name";
     }
   }
 
