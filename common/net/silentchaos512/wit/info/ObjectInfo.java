@@ -14,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
@@ -68,9 +69,9 @@ public class ObjectInfo implements IInfoObject {
     this.unlocalizedName = entityString == null || entityString.isEmpty() ? "unknown"
         : entityString;
 
-    ITextComponent dispName = entity.getDisplayName();
-    if (dispName != null && !dispName.getUnformattedComponentText().isEmpty())
-      this.localizedName = dispName.getUnformattedComponentText();
+    String dispName = safeGetEntityName(entity);
+    if (dispName != null && !dispName.isEmpty())
+      this.localizedName = dispName;
     else if (entity.getName() != null && !entity.getName().isEmpty())
       this.localizedName = entity.getName();
     else
@@ -109,6 +110,17 @@ public class ObjectInfo implements IInfoObject {
       lastNameException = ex.getClass().getName();
       return "Broken Name";
     }
+  }
+
+  protected static String safeGetEntityName(@Nonnull Entity entity) {
+
+    ITextComponent str = null;
+    try {
+      str = entity.getDisplayName();
+    } catch (IllegalArgumentException ex) {
+      str = new TextComponentString(entity.getClass().toString().replaceFirst("class", "ERROR:"));
+    }
+    return str == null ? null : str.getUnformattedComponentText();
   }
 
   public static ModContainer getModFromEntity(Entity entity) {
