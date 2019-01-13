@@ -11,6 +11,7 @@ import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
 import net.silentchaos512.wit.info.ErrorInfo;
+import net.silentchaos512.wit.info.ItemStackInfo;
 
 import javax.annotation.Nullable;
 
@@ -29,27 +30,37 @@ public final class RayTraceHelper {
         if (rt == null) return null;
 
         if (rt.entity != null) {
-            return new HudRenderObject(forEntity(rt));
+            return from(infoForEntity(rt));
         } else {
-            return new HudRenderObject(forBlock(rt, world));
+            return from(infoForBlock(rt, world));
         }
     }
 
-    private static IInfoObject forEntity(RayTraceResult rt) {
+    @Nullable
+    private static HudRenderObject from(IInfoObject info) {
+        return info != null ? new HudRenderObject(info) : null;
+    }
+
+    private static IInfoObject infoForEntity(RayTraceResult rt) {
         return new EntityInfo(rt.entity);
     }
 
-    private static IInfoObject forBlock(RayTraceResult rt, World world) {
+    private static IInfoObject infoForBlock(RayTraceResult rt, World world) {
         BlockPos pos = rt.getBlockPos();
         IBlockState state = world.getBlockState(pos);
         if (state.isAir(world, pos)) return null;
 
-        ItemStack stack = state.getPickBlock(rt, world, pos, Minecraft.getInstance().player);
-        if (stack.isEmpty()) {
-            // TODO: How to handle this?
-            return new ErrorInfo();
+        // Pick block will return something valid in most cases
+        ItemStack pickBlockStack = state.getPickBlock(rt, world, pos, Minecraft.getInstance().player);
+        if (pickBlockStack.isEmpty()) {
+            // Empty pick block, very rare
+            return new ErrorInfo("ItemStack is empty");
+        } else if (new ItemStack(state.getBlock()).isEmpty()) {
+            // Block does not have an item, but we can work with the pick block stack.
+            return new ItemStackInfo(pickBlockStack);
         }
 
+        // Handle block normally
         return new BlockStackInfo(world, state, pos);
     }
 }

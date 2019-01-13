@@ -8,9 +8,18 @@ import net.silentchaos512.wit.api.IInfoObject;
 import java.util.List;
 
 public class ErrorInfo implements IInfoObject {
+    private final String msg;
+
+    public ErrorInfo() {
+        this.msg = "An unknown error has occurred";
+    }
+
+    public ErrorInfo(String msg) {
+        this.msg = msg;
+    }
+
     @Override
     public void addLines(EntityPlayer player, List<ITextComponent> lines) {
-        // TODO: Do anything with this?
-        lines.add(new TextComponentString("An unknown error has occurred."));
+        lines.add(new TextComponentString("Error: " + this.msg));
     }
 }

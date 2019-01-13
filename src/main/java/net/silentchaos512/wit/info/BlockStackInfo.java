@@ -36,8 +36,8 @@ public class BlockStackInfo extends ItemStackInfo {
     public BlockStackInfo(World world, IBlockState state, BlockPos pos) {
         super(new ItemStack(state.getBlock()));
 
-        this.block = Block.getBlockFromItem(this.getStack().getItem());
         this.state = state;
+        this.block = this.state.getBlock();
         this.pos = pos;
         this.tileEntity = tryGetTileEntity(world, this.pos);
         this.harvestTool = this.state.getHarvestTool();
