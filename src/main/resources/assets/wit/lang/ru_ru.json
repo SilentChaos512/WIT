@@ -1,0 +1,20 @@
+{
+    "hud.wit.entity.armor": "Armor: %s / %s",
+    "hud.wit.entity.health": "Здоровье: %s / %s",
+    "hud.wit.harvestable.true": "Можно добыть",
+    "hud.wit.harvestable.false": "Нельзя добыть",
+    "hud.wit.harvestWith": "Инструмент добычи: %s",
+    "hud.wit.harvestWithLevel": "Инструмент добычи: %s (уровень %d)",
+    "hud.wit.inventory.itemCount": "%s x%d",
+    "hud.wit.inventory.omittedCount": "Плюс ещё %d...",
+    "hud.wit.tile.feStorage": "%,d / %,d FE",
+    "hud.wit.tile.tankStorage": "%,d / %,d mB",
+    "hud.wit.tool.axe": "Топор",
+    "hud.wit.tool.pickaxe": "Кирка",
+    "hud.wit.tool.scoop": "Сачок",
+    "hud.wit.tool.shears": "Shears",
+    "hud.wit.tool.shovel": "Лопата",
+    "tooltip.wit.food": "Еда: %d (%.1f)",
+    "tooltip.wit.tool.speed": "Базовая скорость добычи: %.1f",
+    "tooltip.wit.tool.maxDamage": "Макс. урон: %d"
+}

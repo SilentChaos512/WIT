@@ -1,0 +1,20 @@
+{
+    "hud.wit.entity.armor": "Armor: %s / %s",
+    "hud.wit.entity.health": "HP: %s / %s",
+    "hud.wit.harvestable.true": "Harvestable",
+    "hud.wit.harvestable.false": "Not Harvestable",
+    "hud.wit.harvestWith": "Harvest with: %s",
+    "hud.wit.harvestWithLevel": "Harvest with: %s (level %d)",
+    "hud.wit.inventory.itemCount": "%s x%d",
+    "hud.wit.inventory.omittedCount": "Plus %d more...",
+    "hud.wit.tile.feStorage": "%,d / %,d FE",
+    "hud.wit.tile.tankStorage": "%,d / %,d mB",
+    "hud.wit.tool.axe": "Axe",
+    "hud.wit.tool.pickaxe": "Pickaxe",
+    "hud.wit.tool.scoop": "Scoop",
+    "hud.wit.tool.shears": "Shears",
+    "hud.wit.tool.shovel": "Shovel",
+    "tooltip.wit.food": "Food: %d (%.1f)",
+    "tooltip.wit.tool.speed": "Base harvest speed: %.1f",
+    "tooltip.wit.tool.maxDamage": "Max damage: %d"
+}
