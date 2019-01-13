@@ -47,6 +47,9 @@ public class WIT {
     public boolean foundStorageDrawers = false;
     public boolean foundMcMultiPart = false;
 
+    // Temporary hack to check that items are initialized
+    private boolean initFinished = false;
+
     public static WIT INSTANCE;
     private static SideProxy PROXY;
 
@@ -77,6 +80,7 @@ public class WIT {
     private void init(FMLInitializationEvent event) {
         PROXY.init(event);
         Config.save();
+        initFinished = true;
     }
 
     private void postInit(FMLPostInitializationEvent event) {
@@ -96,6 +100,8 @@ public class WIT {
 
     @SuppressWarnings("ChainOfInstanceofChecks")
     private static void onTooltip(ItemTooltipEvent event) {
+        if (!INSTANCE.initFinished) return;
+
         ItemStackInfo itemInfo = new ItemStackInfo(event.getItemStack());
         ItemStack stack = itemInfo.getStack();
         Item item = stack.getItem();
