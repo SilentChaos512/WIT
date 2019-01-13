@@ -37,7 +37,7 @@ import java.util.Map;
 public class WIT {
     public static final String MOD_ID = "wit";
     public static final String MOD_NAME = "WIT";
-    public static final String VERSION_NUMBER = "@VERSION@";
+    public static final String VERSION_NUMBER = "1.1.0";
 
     public static Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
