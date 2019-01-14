@@ -156,7 +156,7 @@ public class WIT {
             return;
         }
 
-        HudRenderObject renderObject = RayTraceHelper.getRenderObject();
+        HudRenderObject renderObject = RayTraceHelper.getRenderObject(event.getPartialTicks());
 
         if (renderObject != null) {
             renderObject.render(event);

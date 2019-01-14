@@ -16,10 +16,13 @@ import net.silentchaos512.wit.info.ItemStackInfo;
 import javax.annotation.Nullable;
 
 public final class RayTraceHelper {
+    private static IInfoObject previousInfo;
+    private static float stickyTimeout = 0;
+
     private RayTraceHelper() { throw new IllegalAccessError("Utility class"); }
 
     @Nullable
-    public static HudRenderObject getRenderObject() {
+    public static HudRenderObject getRenderObject(float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
         Entity renderViewEntity = mc.getRenderViewEntity();
         if (renderViewEntity == null) return null;
@@ -27,18 +30,32 @@ public final class RayTraceHelper {
         World world = renderViewEntity.world;
 
         RayTraceResult rt = mc.objectMouseOver;
-        if (rt == null) return null;
 
-        if (rt.entity != null) {
-            return from(infoForEntity(rt));
-        } else {
-            return from(infoForBlock(rt, world));
+        if (rt != null) {
+            if (rt.entity != null) {
+                // Looking at an entity (longer sticky time)
+                IInfoObject info = infoForEntity(rt);
+                previousInfo = info;
+                stickyTimeout = 80; // TODO: Config for sticky times
+                return new HudRenderObject(info);
+            } else {
+                // Looking at a block?
+                IInfoObject info = infoForBlock(rt, world);
+                if (info != null) {
+                    previousInfo = info;
+                    stickyTimeout = 20; // TODO: Config for sticky times
+                    return new HudRenderObject(info);
+                }
+            }
         }
-    }
 
-    @Nullable
-    private static HudRenderObject from(IInfoObject info) {
-        return info != null ? new HudRenderObject(info) : null;
+        // Looking at nothing right now, show previous for a short time?
+        if (stickyTimeout > 0) {
+            stickyTimeout -= partialTicks;
+            return new HudRenderObject(previousInfo);
+        }
+
+        return null;
     }
 
     private static IInfoObject infoForEntity(RayTraceResult rt) {
