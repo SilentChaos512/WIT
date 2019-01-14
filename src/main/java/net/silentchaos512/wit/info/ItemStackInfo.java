@@ -2,6 +2,7 @@ package net.silentchaos512.wit.info;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.silentchaos512.wit.api.WitBlockReplacements;
@@ -15,8 +16,13 @@ public class ItemStackInfo extends ObjectInfo {
     private final ItemStack stack;
 
     public ItemStackInfo(@Nonnull ItemStack stack) {
-        super(replacementFor(stack).getItem().getRegistryName());
+        super(nameFor(replacementFor(stack)));
         this.stack = replacementFor(stack);
+    }
+
+    private static ResourceLocation nameFor(ItemStack stack) {
+        ResourceLocation regName = stack.getItem().getRegistryName();
+        return regName != null ? regName : new ResourceLocation("unknown_item_error");
     }
 
     private static ItemStack replacementFor(ItemStack stack) {

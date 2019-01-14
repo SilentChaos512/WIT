@@ -11,7 +11,6 @@ import net.silentchaos512.wit.api.WitEntityInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
 import java.util.List;
-import java.util.Objects;
 
 public class EntityInfo extends ObjectInfo {
     protected Entity entity;
@@ -22,7 +21,8 @@ public class EntityInfo extends ObjectInfo {
     }
 
     private static ResourceLocation nameFor(Entity entity) {
-        return Objects.requireNonNull(ForgeRegistries.ENTITIES.getKey(entity.getType()));
+        ResourceLocation regName = ForgeRegistries.ENTITIES.getKey(entity.getType());
+        return regName != null ? regName : new ResourceLocation("unknown_entity_error");
     }
 
     @Override
