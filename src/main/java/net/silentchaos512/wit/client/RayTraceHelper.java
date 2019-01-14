@@ -1,5 +1,6 @@
 package net.silentchaos512.wit.client;
 
+import net.minecraft.block.BlockFlowingFluid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -69,10 +70,16 @@ public final class RayTraceHelper {
 
         // Pick block will return something valid in most cases
         ItemStack pickBlockStack = state.getPickBlock(rt, world, pos, Minecraft.getInstance().player);
-        if (pickBlockStack.isEmpty()) {
-            // Empty pick block, very rare
-            return new ErrorInfo("ItemStack is empty");
-        } else if (new ItemStack(state.getBlock()).isEmpty()) {
+        ItemStack blockStack = new ItemStack(state.getBlock());
+
+        if (pickBlockStack.isEmpty() && blockStack.isEmpty()) {
+            // No information to work with? Water does this.
+            if (state.getBlock() instanceof BlockFlowingFluid) {
+                // Ignore water/lava. Should we be more specific?
+                return null;
+            }
+            return new ErrorInfo("Block has no item?", state.toString());
+        } else if (blockStack.isEmpty()) {
             // Block does not have an item, but we can work with the pick block stack.
             return new ItemStackInfo(pickBlockStack);
         }
