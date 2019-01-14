@@ -73,13 +73,14 @@ public class WIT {
             final String modId = info.getModId();
             ModList.get().getModContainerById(modId).ifPresent(c -> mods.put(modId, c));
         }
-
-        populateBlockReplacements();
     }
 
     private void init(FMLInitializationEvent event) {
         PROXY.init(event);
+        WitBlockReplacements.init();
+
         Config.save();
+
         initFinished = true;
     }
 
@@ -171,20 +172,6 @@ public class WIT {
 //        // HudRenderObject renderObject = getRenderObject();
 //        // TODO ???
 //    }
-
-    public void populateBlockReplacements() {
-        // TODO: Move into WitBlockReplacments?
-        WitBlockReplacements.init();
-        WitBlockReplacements rep = WitBlockReplacements.INSTANCE;
-        if (Config.disguiseMonsterEggBlocks) {
-            rep.add(new ItemStack(Blocks.INFESTED_STONE), new ItemStack(Blocks.STONE));
-            rep.add(new ItemStack(Blocks.INFESTED_COBBLESTONE), new ItemStack(Blocks.COBBLESTONE));
-            rep.add(new ItemStack(Blocks.INFESTED_CHISELED_STONE_BRICKS), new ItemStack(Blocks.CHISELED_STONE_BRICKS));
-            rep.add(new ItemStack(Blocks.INFESTED_CRACKED_STONE_BRICKS), new ItemStack(Blocks.CRACKED_STONE_BRICKS));
-            rep.add(new ItemStack(Blocks.INFESTED_MOSSY_STONE_BRICKS), new ItemStack(Blocks.MOSSY_STONE_BRICKS));
-            rep.add(new ItemStack(Blocks.INFESTED_STONE_BRICKS), new ItemStack(Blocks.STONE_BRICKS));
-        }
-    }
 
     public static boolean shouldDisplayModName() {
         return shouldDisplayObject(Config.tooltipDisplayModName, Config.tooltipDisplayModNameShift);

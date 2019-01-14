@@ -7,3 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Incomplete port to 1.13. Config does not work. Formatting codes broken.
 ### Added
 - A "sticky time" to HUD info. When no longer looking at an object, the previous is shown for a short time (currently 1 second for blocks and 4 seconds for entities).
+### Changed
+- Improved block replacements, no reload required (for devs: it maps to a supplier now)
