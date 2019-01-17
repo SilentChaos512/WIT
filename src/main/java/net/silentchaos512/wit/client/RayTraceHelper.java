@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.silentchaos512.wit.api.IInfoObject;
+import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
 import net.silentchaos512.wit.info.ErrorInfo;
@@ -18,7 +19,7 @@ import javax.annotation.Nullable;
 
 public final class RayTraceHelper {
     private static IInfoObject previousInfo;
-    private static float stickyTimeout = 0;
+    private static double stickyTimeout = 0;
 
     private RayTraceHelper() { throw new IllegalAccessError("Utility class"); }
 
@@ -37,14 +38,14 @@ public final class RayTraceHelper {
                 // Looking at an entity (longer sticky time)
                 IInfoObject info = infoForEntity(rt);
                 previousInfo = info;
-                stickyTimeout = 80; // TODO: Config for sticky times
+                stickyTimeout = Config.HUD.entityStickyTime.get() * 20;
                 return new HudRenderObject(info);
             } else {
                 // Looking at a block?
                 IInfoObject info = infoForBlock(rt, world);
                 if (info != null) {
                     previousInfo = info;
-                    stickyTimeout = 20; // TODO: Config for sticky times
+                    stickyTimeout = Config.HUD.blockStickyTime.get() * 20;
                     return new HudRenderObject(info);
                 }
             }

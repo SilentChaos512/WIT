@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.silentchaos512.wit.client.key.KeyTracker;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -19,6 +20,9 @@ public class ConfigValueTextElement {
     public enum ShowCondition {
         NEVER(p -> false),
         SNEAK_ONLY(Entity::isSneaking),
+        ALT_KEY(p -> KeyTracker.altDown()),
+        CTRL_KEY(p -> KeyTracker.ctrlDown()),
+        SHIFT_KEY(p -> KeyTracker.shiftDown()),
         ALWAYS(p -> true);
 
         final Predicate<EntityPlayer> shouldShow;

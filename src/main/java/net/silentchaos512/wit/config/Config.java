@@ -48,6 +48,8 @@ public final class Config {
         public final IntValue inventoryMaxLines;
         public final IntValue offsetX;
         public final IntValue offsetY;
+        public final DoubleValue blockStickyTime;
+        public final DoubleValue entityStickyTime;
         // TODO: Change back to ConfigValue<...> when defineEnum is fixed
         public final Supplier<HudAnchor> position;
         public final Supplier<TextAlignment> textAlignment;
@@ -85,6 +87,16 @@ public final class Config {
                     .comment("Offset for HUD position. Change if you need to fine-tune the position.")
                     .defineInRange("position.offsetY", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
+            builder.comment(
+                    "Sticky time is the length of time (in seconds) the HUD overlay will remain",
+                    "open after the target is out of range. Handy when entities can't be still!")
+                    .push("stickyTime");
+
+            blockStickyTime = builder.defineInRange("block", 1, 0, Double.MAX_VALUE);
+            entityStickyTime = builder.defineInRange("entity", 4, 0, Double.MAX_VALUE);
+
+            builder.pop(); //stickyTime
+
 //            position = builder
 //                    .comment("The position of the HUD overlay.",
 //                            validValuesComment(HudAnchor.class))
@@ -99,7 +111,8 @@ public final class Config {
             builder.comment("Alignment of text in the HUD overlay.", validValuesComment(TextAlignment.class));
             textAlignment = defineEnumWorkaround(builder, "textAlignment", TextAlignment.CENTER);
 
-            builder.comment("Settings for what is displayed in the HUD overlay.")
+            builder.comment("Settings for what is displayed in the HUD overlay.",
+                    "Valid values for \"show\": ALWAYS, NEVER, SNEAK_ONLY, CTRL_KEY, ALT_KEY")
                     .push("elements");
 
             elementEntityArmor = ConfigValueTextElement.define(builder,
@@ -158,8 +171,41 @@ public final class Config {
     }
 
     public static class Tooltip {
+        public final ConfigValueTextElement elementFood;
+        public final ConfigValueTextElement elementModName;
+        //        public final ConfigValueTextElement elementTags;
+        public final ConfigValueTextElement elementTool;
+
         Tooltip(ForgeConfigSpec.Builder builder) {
-            ;
+            builder.comment("Settings for additional tooltip information",
+                    "Valid values for \"show\": ALWAYS, NEVER, SHIFT_KEY, CTRL_KEY, ALT_KEY")
+                    .push("tooltips");
+
+            elementFood = ConfigValueTextElement.define(builder,
+                    "foodStats",
+                    "Show food properties",
+                    ConfigValueTextElement.ShowCondition.ALWAYS,
+                    TextFormatting.GRAY);
+
+            elementModName = ConfigValueTextElement.define(builder,
+                    "modName",
+                    "Show the mod name",
+                    ConfigValueTextElement.ShowCondition.ALWAYS,
+                    TextFormatting.DARK_PURPLE);
+
+//            elementTags = ConfigValueTextElement.define(builder,
+//                    "tags",
+//                    "Show item tags",
+//                    ConfigValueTextElement.ShowCondition.SHIFT_KEY,
+//                    TextFormatting.GRAY);
+
+            elementTool = ConfigValueTextElement.define(builder,
+                    "toolStats",
+                    "Show basic properties of harvest tools",
+                    ConfigValueTextElement.ShowCondition.SHIFT_KEY,
+                    TextFormatting.GRAY);
+
+            builder.pop(); //tooltips
         }
     }
 
@@ -176,39 +222,6 @@ public final class Config {
     public static void load() {
         loadFrom(FMLPaths.CONFIGDIR.get());
     }
-
-    /*
-     * Tooltip display options
-     */
-
-    public static boolean tooltipDisplayIdMeta = false;
-    public static String tooltipDisplayIdMetaComment = "Display the item ID and damage value by the item name.";
-    public static boolean tooltipDisplayModName = true;
-    public static String tooltipDisplayModNameComment = "Display the name of the mod in tooltips.";
-    public static boolean tooltipDisplayModNameShift = false;
-    public static String tooltipDisplayModNameShiftComment = "Display the name of the mod only when holding shift.";
-    public static boolean tooltipDisplayOreDict = true;
-    public static String tooltipDisplayOreDictComment = "Display the ore dictionary entries for the block/item.";
-    public static boolean tooltipDisplayOreDictShift = true;
-    public static String tooltipDisplayOreDictShiftComment = "Display the ore dictionary entries only when holding shift.";
-    public static boolean tooltipDisplayFoodStats = true;
-    public static String tooltipDisplayFoodStatsComment = "Display the food value and saturation of foods in the tooltip.";
-    public static boolean tooltipDisplayFoodStatsShift = true;
-    public static String tooltipDisplayFoodStatsShiftComment = "Display food stats only when holding shift.";
-    public static boolean tooltipDisplayToolStats = true;
-    public static String tooltipDisplayToolStatsComment = "Display mining speed and durability of tools when possible.";
-    public static boolean tooltipDisplayToolStatsShift = true;
-    public static String tooltipDisplayToolStatsShiftComment = "Display tool stats only when shift is held.";
-
-    /*
-     * Formatting
-     */
-
-    public static String formatModName = "&5";
-    // Originally: The formatting codes to use in the tooltip. Use & to substitute for the control character.
-    public static String formatModNameComment = "Formatting for mod names.";
-    public static String formatResourceName = "&7";
-    public static String formatResourceNameComment = "Formatting for resource names.";
 
     // Enum helper methods
 

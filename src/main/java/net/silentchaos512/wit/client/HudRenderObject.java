@@ -24,7 +24,7 @@ public class HudRenderObject {
     private static final int BACKGROUND_TRANSITION_TIME = 4;
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(WIT.MOD_ID, "textures/background.png");
 
-    private static boolean renderHud = true;
+    public static boolean renderHud = true;
     private static double backgroundHeight = 0.0;
     // TODO: Why are these public?
     public static int lastMaxBackgroundWidth = 0;
@@ -80,6 +80,7 @@ public class HudRenderObject {
         if (text instanceof TextComponentTranslation) {
             // For some reason, translated text completely ignores formatting D:
             // This just applies the missing formatting code
+            // NOTE: I verified this does not happen in vanilla 1.13.2 for advancement titles
             return text.getStyle().getFormattingCode() + line;
         }
         return line;

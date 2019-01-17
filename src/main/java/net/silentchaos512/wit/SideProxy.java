@@ -3,6 +3,8 @@ package net.silentchaos512.wit;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
 import net.silentchaos512.wit.api.WitBlockReplacements;
+import net.silentchaos512.wit.client.TooltipHandler;
+import net.silentchaos512.wit.client.key.KeyTracker;
 
 class SideProxy {
     SideProxy() {
@@ -22,6 +24,9 @@ class SideProxy {
 
     static class Client extends SideProxy {
         Client() {
+            KeyTracker.init();
+            TooltipHandler.init();
+
             FMLModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
         }
 
