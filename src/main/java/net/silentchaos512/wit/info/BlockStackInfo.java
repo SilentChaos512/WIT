@@ -24,6 +24,7 @@ import net.silentchaos512.wit.config.Config;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class BlockStackInfo extends ItemStackInfo {
     private final IBlockState state;
@@ -52,9 +53,8 @@ public class BlockStackInfo extends ItemStackInfo {
     @Override
     public void addLines(EntityPlayer player, List<ITextComponent> lines) {
         // Name, tile entity
-        if (Config.hudObjectName.shouldDisplay(player)) {
-            lines.add(displayBlockName(player));
-        }
+        Config.HUD.elementName.format(player, this::displayItemName).ifPresent(text ->
+                lines.add(displayBlockName(player, text)));
 
         // Mob spawner?
         getLinesForMobSpawner(lines);
@@ -69,29 +69,25 @@ public class BlockStackInfo extends ItemStackInfo {
         getLinesForBlockHarvestability(player, lines);
 
         // Registry name
-        if (Config.hudResourceName.shouldDisplay(player)) {
-            lines.add(this.displayRegistryName());
-        }
+        Config.HUD.elementRegistryName.format(player, this::displayRegistryName).ifPresent(lines::add);
 
         // WIT HUD info event
-        processInfoEvent(lines, new WitBlockInfoEvent(player, player.world, Config.hudAdvancedMode, pos, state));
+        processInfoEvent(lines, new WitBlockInfoEvent(player, player.world, Config.GENERAL.advancedMode.get(), pos, state));
 
         // Mod name
-        if (Config.hudModName.shouldDisplay(player)) {
-            lines.add(this.displayModName());
-        }
+        Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);
     }
 
-    private ITextComponent displayBlockName(EntityPlayer player) {
-        ITextComponent text = this.displayItemName();
-        if (tileEntity != null && Config.hudTileEntity.shouldDisplay(player)) {
-            text.appendSibling(Config.hudTileEntity.format(" [TE]"));
+    private ITextComponent displayBlockName(EntityPlayer player, ITextComponent text) {
+        if (tileEntity != null) {
+            Supplier<ITextComponent> marker = () -> new TextComponentString(" [TE]");
+            Config.HUD.elementTileEntityMarker.format(player, marker).ifPresent(text::appendSibling);
         }
         return text;
     }
 
     private void getLinesForBlockInventory(EntityPlayer player, List<ITextComponent> lines) {
-        if (!Config.hudBlockInventory.shouldDisplay(player) || !(this.tileEntity instanceof IInventory)) {
+        if (!Config.HUD.elementInventoryContents.isShownFor(player) || !(this.tileEntity instanceof IInventory)) {
             return;
         }
 
@@ -111,28 +107,24 @@ public class BlockStackInfo extends ItemStackInfo {
         // else {
         List<ItemStack> invStacks = getInventoryStacks((IInventory) tileEntity);
         // Display first n items according to config setting.
-        for (int i = 0; i < invStacks.size() && i < Config.hudInventoryMaxListCount; ++i) {
+        for (int i = 0; i < invStacks.size() && i < Config.HUD.inventoryMaxLines.get(); ++i) {
             ItemStack stack = invStacks.get(i);
             try {
                 int count = stack.getCount();
-                lines.add(displayInventoryContents(stack, count));
+                Config.HUD.elementInventoryContents.format(player, () ->
+                        new TextComponentTranslation("hud.wit.inventory.itemCount", stack.getDisplayName(), count))
+                        .ifPresent(lines::add);
             } catch (Exception ex) {
                 // Looks like a mod has done something stupid with their items...
                 lines.add(new TextComponentString(TextFormatting.RED + "ERROR: " + stack.getItem().getRegistryName()));
             }
         }
         // How many did we not display?
-        int omittedCount = invStacks.size() - Config.hudInventoryMaxListCount;
+        int omittedCount = invStacks.size() - Config.HUD.inventoryMaxLines.get();
         if (omittedCount > 0) {
             lines.add(new TextComponentTranslation("wit.OmittedInventoryItems", omittedCount));
         }
         // }
-    }
-
-    private static ITextComponent displayInventoryContents(ItemStack stack, int count) {
-        ITextComponent text = new TextComponentTranslation("hud.wit.inventory.itemCount",
-                stack.getDisplayName(), count);
-        return Config.hudBlockInventory.format().appendSibling(text);
     }
 
     private static NonNullList<ItemStack> getInventoryStacks(IInventory inv) {
@@ -147,30 +139,33 @@ public class BlockStackInfo extends ItemStackInfo {
     }
 
     private void getLinesForBlockHarvestability(EntityPlayer player, List<ITextComponent> lines) {
-        if (!Config.hudHarvestable.shouldDisplay(player)) return;
+        if (!Config.HUD.elementHarvest.isShownFor(player)) return;
 
         boolean canHarvest = ForgeHooks.canHarvestBlock(state, player, player.world, pos)
                 && state.getBlockHardness(player.world, pos) >= 0;
-        ITextComponent format = canHarvest
-                ? Config.hudHarvestable.format()
-                : Config.hudHarvestable.format2();
 
         if (harvestTool != null && harvestLevel > -1) {
             // Known tool
             ITextComponent tool = new TextComponentTranslation("hud.wit.tool." + harvestTool);
             if (harvestLevel > 0) {
                 // Specific level
-                ITextComponent text = new TextComponentTranslation("hud.wit.harvestWithLevel", tool, harvestLevel);
-                lines.add(format.appendSibling(text));
+                Config.HUD.elementHarvest.formatEither(player, () ->
+                        new TextComponentTranslation("hud.wit.harvestWithLevel", tool, harvestLevel), canHarvest)
+                        .ifPresent(lines::add);
             } else {
                 // Any/unknown level
-                ITextComponent text = new TextComponentTranslation("hud.wit.harvestWith", tool);
-                lines.add(format.appendSibling(text));
+                Config.HUD.elementHarvest.formatEither(player, () ->
+                        new TextComponentTranslation("hud.wit.harvestWith", tool), canHarvest)
+                        .ifPresent(lines::add);
             }
         } else {
             // Unknown tool, but we know whether or not it can be harvested.
-            String key = "hud.wit.harvestable." + canHarvest;
-            lines.add(format.appendSibling(new TextComponentTranslation(key)));
+            Supplier<ITextComponent> text = () ->
+                    new TextComponentTranslation("hud.wit.harvestable." + canHarvest);
+            Config.HUD.elementHarvest.formatEither(player, text, canHarvest).ifPresent(t -> {
+                String mark = " " + (canHarvest ? "\u2713" : "\u2717"); // check mark or x
+                lines.add(t.appendText(mark));
+            });
         }
     }
 

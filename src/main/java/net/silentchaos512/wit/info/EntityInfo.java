@@ -1,7 +1,7 @@
 package net.silentchaos512.wit.info;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
@@ -11,6 +11,7 @@ import net.silentchaos512.wit.api.WitEntityInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class EntityInfo extends ObjectInfo {
     protected Entity entity;
@@ -28,37 +29,36 @@ public class EntityInfo extends ObjectInfo {
     @Override
     public void addLines(EntityPlayer player, List<ITextComponent> lines) {
         // Entity name
-        if (Config.hudObjectName.shouldDisplay(player)) {
-            lines.add(this.displayEntityName());
-        }
+        Config.HUD.elementName.format(player, this::displayEntityName).ifPresent(lines::add);
 
         // Health
-        if (entity instanceof EntityLiving) {
-            EntityLiving entityLiving = (EntityLiving) entity;
-            if (Config.hudEntityHealth.shouldDisplay(player)) {
-                String current = String.format("%.1f", entityLiving.getHealth());
-                String max = String.format("%.1f", entityLiving.getMaxHealth());
-                lines.add(new TextComponentTranslation("hud.wit.entity.health", current, max));
-            }
-        }
+        if (entity instanceof EntityLivingBase) {
+            EntityLivingBase entityLiving = (EntityLivingBase) entity;
+            showHealth(player, entityLiving, lines);
 
-        // TODO: Armor?
+            // TODO: Armor?
+        }
 
         // Registry name
-        if (Config.hudResourceName.shouldDisplay(player)) {
-            lines.add(this.displayRegistryName());
-        }
+        Config.HUD.elementRegistryName.format(player, this::displayRegistryName).ifPresent(lines::add);
 
         // WIT HUD info event
-        processInfoEvent(lines, new WitEntityInfoEvent(player, entity.world, Config.hudAdvancedMode, entity));
+        processInfoEvent(lines, new WitEntityInfoEvent(player, entity.world, Config.GENERAL.advancedMode.get(), entity));
 
         // Mod name
-        if (Config.hudModName.shouldDisplay(player)) {
-            lines.add(this.displayModName());
-        }
+        Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);
     }
 
     private ITextComponent displayEntityName() {
-        return this.entity.getDisplayName();
+        return entity.getDisplayName();
+    }
+
+    private static void showHealth(EntityPlayer player, EntityLivingBase entity, List<ITextComponent> lines) {
+        if (!Config.HUD.elementEntityHealth.isShownFor(player)) return;
+
+        String current = String.format("%.1f", entity.getHealth());
+        String max = String.format("%.1f", entity.getMaxHealth());
+        Supplier<ITextComponent> text = () -> new TextComponentTranslation("hud.wit.entity.health", current, max);
+        Config.HUD.elementEntityHealth.format(player, text).ifPresent(lines::add);
     }
 }

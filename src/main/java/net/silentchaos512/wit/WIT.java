@@ -13,15 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
-import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.client.HudRenderObject;
 import net.silentchaos512.wit.client.RayTraceHelper;
 import net.silentchaos512.wit.client.key.KeyTracker;
@@ -29,9 +21,6 @@ import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.ItemStackInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Mod(WIT.MOD_ID)
 public class WIT {
@@ -41,14 +30,8 @@ public class WIT {
 
     public static Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
-    public Map<String, ModContainer> mods;
-    float lastPartialTicks = 0f;
-
     public boolean foundStorageDrawers = false;
     public boolean foundMcMultiPart = false;
-
-    // Temporary hack to check that items are initialized
-    private boolean initFinished = false;
 
     public static WIT INSTANCE;
     private static SideProxy PROXY;
@@ -56,52 +39,18 @@ public class WIT {
     public WIT() {
         INSTANCE = this;
         PROXY = DistExecutor.runForDist(() -> () -> new SideProxy.Client(), () -> () -> new SideProxy.Server());
-        FMLModLoadingContext.get().getModEventBus().addListener(this::preInit);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::init);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::postInit);
-//        MinecraftForge.EVENT_BUS.register(this);
+        Config.load();
+
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, WIT::onTooltip);
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, WIT::onRenderOverlay);
     }
 
-    private void preInit(FMLPreInitializationEvent event) {
-        PROXY.preInit(event);
-//        Config.init(event.getSuggestedConfigurationFile());
-
-        mods = new HashMap<>();
-        for (ModInfo info : ModList.get().getMods()) {
-            final String modId = info.getModId();
-            ModList.get().getModContainerById(modId).ifPresent(c -> mods.put(modId, c));
-        }
-    }
-
-    private void init(FMLInitializationEvent event) {
-        PROXY.init(event);
-        WitBlockReplacements.init();
-
-        Config.save();
-
-        initFinished = true;
-    }
-
-    private void postInit(FMLPostInitializationEvent event) {
-        PROXY.postInit(event);
-        // TODO
-//        foundStorageDrawers = Loader.isModLoaded("StorageDrawers");
-//        foundMcMultiPart = Loader.isModLoaded("mcmultipart");
-    }
-
-//    @SubscribeEvent
-//    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-//        if (event.getModID().equals(MOD_ID)) {
-//            Config.load();
-//            Config.save();
-//        }
-//    }
-
     @SuppressWarnings("ChainOfInstanceofChecks")
     private static void onTooltip(ItemTooltipEvent event) {
-        if (!INSTANCE.initFinished) return;
+        if (event.getItemStack().isEmpty() || event.getItemStack().getItem().getRegistryName() == null) {
+            // Sometimes this event is fired too early?
+            return;
+        }
 
         ItemStackInfo itemInfo = new ItemStackInfo(event.getItemStack());
         ItemStack stack = itemInfo.getStack();
@@ -153,7 +102,7 @@ public class WIT {
         }
 
         GuiScreen screen = Minecraft.getInstance().currentScreen;
-        if (screen != null && !screen.doesGuiPauseGame() && Config.hudHideWhenGuiOpen) {
+        if (screen != null && !screen.doesGuiPauseGame() && Config.HUD.hideWhenGuiOpen.get()) {
             return;
         }
 

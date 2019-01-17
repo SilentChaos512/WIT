@@ -2,46 +2,46 @@ package net.silentchaos512.wit.info;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModContainer;
-import net.silentchaos512.wit.WIT;
+import net.minecraftforge.fml.ModList;
 import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.api.WitHudInfoEvent;
-import net.silentchaos512.wit.config.Config;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class ObjectInfo implements IInfoObject {
     private final ResourceLocation name;
-    private final ModContainer mod;
+    private final ModContainer mod; // TODO: Is this needed?
     private final String modName;
 
     ObjectInfo(ResourceLocation name) {
         this.name = name;
-        this.mod = WIT.INSTANCE.mods.get(this.name.getNamespace());
+        this.mod = ModList.get().getModContainerById(name.getNamespace()).orElse(null);
         this.modName = this.mod != null ? mod.getModInfo().getDisplayName() : "Minecraft";
     }
 
     public ResourceLocation getName() {
-        return this.name;
+        return name;
     }
 
     public String getModName() {
-        return this.modName;
+        return modName;
     }
 
     @Nullable
     public ModContainer getMod() {
-        return this.mod;
+        return mod;
     }
 
     ITextComponent displayModName() {
-        return Config.hudModName.format(this.modName);
+        return new TextComponentString(modName);
     }
 
     ITextComponent displayRegistryName() {
-        return Config.hudResourceName.format(this.name.toString());
+        return new TextComponentString(name.toString());
     }
 
     static void processInfoEvent(List<ITextComponent> lines, WitHudInfoEvent event) {
