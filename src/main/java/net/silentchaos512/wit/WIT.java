@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 public class WIT {
     public static final String MOD_ID = "wit";
     public static final String MOD_NAME = "WIT";
-    public static final String VERSION_NUMBER = "1.1.0";
+    public static final String VERSION_NUMBER = "1.1.1";
 
     public static Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
@@ -30,7 +30,7 @@ public class WIT {
     public WIT() {
         INSTANCE = this;
         PROXY = DistExecutor.runForDist(() -> () -> new SideProxy.Client(), () -> () -> new SideProxy.Server());
-        Config.load();
+//        Config.load();
 
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, WIT::onRenderOverlay);
     }

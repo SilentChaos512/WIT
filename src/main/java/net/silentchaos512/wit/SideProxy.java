@@ -5,6 +5,7 @@ import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
 import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.client.TooltipHandler;
 import net.silentchaos512.wit.client.key.KeyTracker;
+import net.silentchaos512.wit.config.Config;
 
 class SideProxy {
     SideProxy() {
@@ -13,6 +14,8 @@ class SideProxy {
         FMLModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLModLoadingContext.get().getModEventBus().addListener(this::imcEnqueue);
         FMLModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
+
+        Config.register(FMLModLoadingContext.get());
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

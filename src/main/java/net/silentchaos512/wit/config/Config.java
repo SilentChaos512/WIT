@@ -6,13 +6,14 @@ import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.lib.HudAnchor;
 import net.silentchaos512.wit.lib.TextAlignment;
 
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.function.Supplier;
 
 public final class Config {
@@ -213,14 +214,28 @@ public final class Config {
 
     private Config() { }
 
-    private static void loadFrom(final Path configRoot) {
-        Path configFile = configRoot.resolve(WIT.MOD_ID + ".toml");
-        spec.setConfigFile(configFile);
-        WIT.LOGGER.debug("Loaded config from {}", configFile);
+    @SubscribeEvent
+    public static void onLoad(final ModConfig.Loading configEvent) {
+        WIT.LOGGER.debug("Loaded config file {}", configEvent.getConfig().getFileName());
     }
 
-    public static void load() {
-        loadFrom(FMLPaths.CONFIGDIR.get());
+    @SubscribeEvent
+    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
+        WIT.LOGGER.fatal("Config just got changed on the file system!");
+    }
+
+//    private static void loadFrom(final Path configRoot) {
+//        Path configFile = configRoot.resolve(WIT.MOD_ID + ".toml");
+////        spec.setConfigFile(configFile);
+//        WIT.LOGGER.debug("Loaded config from {}", configFile);
+//    }
+
+//    public static void load() {
+//        loadFrom(FMLPaths.CONFIGDIR.get());
+//    }
+
+    public static void register(FMLModLoadingContext ctx) {
+        ctx.registerConfig(ModConfig.Type.CLIENT, spec);
     }
 
     // Enum helper methods
