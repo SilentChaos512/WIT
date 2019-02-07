@@ -1,10 +1,8 @@
 package net.silentchaos512.wit.api;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IItemProvider;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.silentchaos512.wit.config.Config;
 
 import java.util.Map;
@@ -29,12 +27,12 @@ public class WitBlockReplacements implements IBlockReplacements {
         INSTANCE.addForInfestedBlock(Blocks.INFESTED_STONE_BRICKS, Blocks.STONE_BRICKS);
     }
 
-    private void addForInfestedBlock(Block infested, IItemProvider normal) {
+    private void addForInfestedBlock(IItemProvider infested, IItemProvider normal) {
         add(infested, () -> new ItemStack(Config.GENERAL.disguiseInfestedBlocks.get() ? normal : infested));
     }
 
-    private static String keyFor(IForgeRegistryEntry<?> blockOrItem) {
-        return Objects.requireNonNull(blockOrItem.getRegistryName()).toString();
+    private static String keyFor(IItemProvider blockOrItem) {
+        return Objects.requireNonNull(blockOrItem.asItem().getRegistryName()).toString();
     }
 
     private static String keyFor(ItemStack stack) {
@@ -44,8 +42,8 @@ public class WitBlockReplacements implements IBlockReplacements {
         return Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
     }
 
-    public void add(IForgeRegistryEntry<?> actualBlockOrItem, Supplier<ItemStack> display) {
-        map.put(keyFor(actualBlockOrItem), display);
+    public void add(IItemProvider actual, Supplier<ItemStack> display) {
+        map.put(keyFor(actual), display);
     }
 
     public void add(ItemStack actual, Supplier<ItemStack> display) {

@@ -5,32 +5,36 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "3.+", changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
+plugins {
+    id 'maven'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.8.4"
+    id "com.matthewprenger.cursegradle" version "1.1.0"
+}
 
-version = '1.1.0'
-group = 'net.silentchaos512.wit'
-archivesBaseName = 'wit'
+apply plugin: 'net.minecraftforge.gradle'
+//apply plugin: 'eclipse'
+
+repositories {
+    flatDir {
+        name "fileRepo"
+        dirs "repo"
+    }
+    mavenLocal()
+}
+
+def versionInfo = getGitVersion()
+version = "${versionInfo['version']}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20180921-1.13'
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
-    //accessTransformer = file('my_at.cfg')
+    mappings channel: "${project.mcp_mappings_channel}".toString(),
+             version: "${project.mcp_mappings_version}".toString()
 
-    // default run configurations.
-    // these can be tweaked, removed, or duplicated as needed.
     runs {
         client = {
             workingDirectory project.file('run').canonicalPath
@@ -43,43 +47,20 @@ minecraft {
 }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge.test:forge:1.13-24.0.83-1.13-pre'
-
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // These dependencies get remapped to your current MCP mappings
-    //deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+    minecraft 'net.minecraftforge.test:forge:1.13-24.0.166-1.13-pre'
 }
 
 processResources {
     // this will ensure that this task is redone when the versions change.
-    inputs.property 'version', project.version
-    inputs.property 'mcversion', '1.13'
+    inputs.property 'version', "${versionInfo['version']}"
+    inputs.property 'mcversion', "${project.mc_version}"
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'META_INF/mods.toml'
                 
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion': '1.13'
+        expand 'version': "${versionInfo['version']}", 'mcversion': "${project.mc_version}"
     }
 
     // copy everything else except the mods.toml
@@ -87,3 +68,116 @@ processResources {
         exclude 'META_INF/mods.toml'
     }
 }
+
+jar {
+    appendix = "${project.mc_version}"
+}
+
+task sourcesJar(type: Jar) {
+    appendix = "${project.mc_version}"
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    appendix = "${project.mc_version}"
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        WIT(MavenPublication) {
+            groupId 'net.silentchaos512'
+            artifactId 'wit'
+            version "${versionInfo['version_short']}".toString()
+
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['WIT']
+
+    pkg {
+        repo = 'wit'
+        name = 'wit'
+        licenses = ["LGPL-3.0"]
+        vcsUrl = 'https://github.com/SilentChaos512/WIT.git'
+
+        version {
+            name = "${versionInfo['version_short']}".toString()
+            desc = "WIT (1.13) ${versionInfo['version_short']}".toString()
+            released = new Date()
+            vcsTag = "v${versionInfo['version_short']}".toString()
+//            attributes = []
+        }
+    }
+}
+
+// Version stuff
+
+def getGitVersion() {
+    def out = [:]
+
+    // Call git command
+    def outStream = new ByteArrayOutputStream()
+    def result = exec {
+        executable = 'git'
+        args = [ 'describe', '--long' ]
+        standardOutput = outStream
+    }
+
+    def fullVersion = outStream.toString().trim()
+    def matcher = fullVersion =~ /(\d+).(\d+).(\d+)-(.*)/
+
+    def maj = matcher[0][1]
+    def min = matcher[0][2]
+    def rev = matcher[0][3]
+    def bn = getBuildNumber()
+
+    out['build.major.number'] = maj.toString()
+    out['build.minor.number'] = min.toString()
+    out['build.revision.number'] = rev.toString()
+    out['build.githash'] = matcher[0][4].toString()
+    out['build.number'] = bn.toString()
+    out['version_short'] = "${maj}.${min}.${rev}".toString()
+    out['version'] = "${maj}.${min}.${rev}+${bn}".toString()
+
+    return out;
+}
+
+// Build number tracking
+
+String getBuildNumber() {
+    def versionFile = file('version.properties')
+    if (versionFile.canRead()) {
+        Properties versionProps = new Properties()
+        versionProps.load(new FileInputStream(versionFile))
+        return versionProps['build_num'].toString()
+    }
+    return "1"
+}
+
+task incrementBuild {
+    doFirst {
+        def versionFile = file('version.properties')
+        if (versionFile.canRead()) {
+            Properties versionProps = new Properties()
+            versionProps.load(new FileInputStream(versionFile))
+            def num = versionProps['build_num'].toInteger() + 1
+            println("incrementing BuildNumber to: " + num)
+            versionProps['build_num'] = num.toString()
+            versionProps.store(versionFile.newWriter(), null)
+        } else {
+            println("version.properties file not found! Ignoring.")
+        }
+    }
+}
+build.finalizedBy incrementBuild

@@ -16,23 +16,23 @@ displayURL="https://minecraft.curseforge.com/projects/wit-what-is-that" #optiona
 # A file name (in the root of the mod JAR) containing a logo for display
 #logoFile="examplemod.png" #optional
 # A text field displayed in the mod UI
-credits="" #optional
+credits="SilentChaos512" #optional
 # A text field displayed in the mod UI
 authors="SilentChaos512" #optional
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
-# The modid of the mod
-modId="wit" #mandatory
-# The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="${version}" #mandatory
- # A display name for the mod
-displayName="WIT" #mandatory
-# The description text for the mod (multi line!) (#mandatory)
-description='''
-WIT (What Is That)
+    # The modid of the mod
+    modId="wit" #mandatory
+    # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
+    version="${file.jarVersion}" #mandatory
+     # A display name for the mod
+    displayName="WIT" #mandatory
+    # The description text for the mod (multi line!) (#mandatory)
+    description='''
+    WIT (What Is That)
 
-Lightweight mod that display information about what the player is looking at.
-'''
+    Lightweight mod that display information about what the player is looking at.
+    '''
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.wit]] #optional
@@ -47,9 +47,9 @@ Lightweight mod that display information about what the player is looking at.
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.wit]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.13]"
-    ordering="NONE"
-    side="BOTH"
+#[[dependencies.wit]]
+#    modId="minecraft"
+#    mandatory=true
+#    versionRange="[1.13]"
+#    ordering="NONE"
+#    side="BOTH"
