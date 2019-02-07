@@ -40,15 +40,18 @@ public final class KeyTracker {
         }
     }
 
-    public static boolean altDown() {
-        return InputMappings.isKeyDown(GLFW.GLFW_MOD_ALT);
+    public static boolean shiftDown() {
+        return InputMappings.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputMappings.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     public static boolean ctrlDown() {
-        return InputMappings.isKeyDown(GLFW.GLFW_MOD_CONTROL);
+        return InputMappings.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL)
+                || InputMappings.isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
-    public static boolean shiftDown() {
-        return InputMappings.isKeyDown(GLFW.GLFW_MOD_SHIFT);
+    public static boolean altDown() {
+        return InputMappings.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT)
+                || InputMappings.isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT);
     }
 }
