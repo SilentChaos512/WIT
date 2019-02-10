@@ -6,8 +6,8 @@ import com.electronwill.nightconfig.core.io.ParsingMode;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import net.fabricmc.loader.FabricLoader;
 import net.minecraft.text.TextFormat;
+import net.silentchaos512.utils.Anchor;
 import net.silentchaos512.utils.config.*;
-import net.silentchaos512.wit.lib.HudAnchor;
 import net.silentchaos512.wit.lib.TextAlignment;
 
 public final class Config {
@@ -49,7 +49,7 @@ public final class Config {
         public final IntValue offsetY;
         public final DoubleValue blockStickyTime;
         public final DoubleValue entityStickyTime;
-        public final EnumValue<HudAnchor> position;
+        public final EnumValue<Anchor> position;
         public final EnumValue<TextAlignment> textAlignment;
 
         public final ConfigValueTextElement elementEntityHealth;
@@ -103,8 +103,8 @@ public final class Config {
             position = wrapper
                     .builder("hud.position.anchor")
                     .comment("Position of the HUD overlay",
-                            EnumValue.allValuesComment(HudAnchor.class))
-                    .defineEnum(HudAnchor.TOP_CENTER);
+                            EnumValue.allValuesComment(Anchor.class))
+                    .defineEnum(Anchor.TOP_CENTER);
             textAlignment = wrapper
                     .builder("hud.textAlignment")
                     .comment("Alignment of text in the HUD overlay.",

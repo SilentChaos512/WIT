@@ -7,6 +7,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.text.TextComponent;
 import net.minecraft.util.Identifier;
+import net.silentchaos512.utils.Anchor;
 import net.silentchaos512.wit.Wit;
 import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.config.Config;
@@ -19,6 +20,7 @@ import java.util.List;
 public class HudRenderObject {
     private static final int VERTICAL_LINE_SPACING = 2;
     private static final int BACKGROUND_PADDING = 3;
+    private static final int MARGIN = BACKGROUND_PADDING + 2;
     private static final int BACKGROUND_TRANSITION_TIME = 4;
     private static final Identifier BACKGROUND_TEXTURE = new Identifier(Wit.MOD_ID, "textures/background.png");
 
@@ -48,12 +50,15 @@ public class HudRenderObject {
             info.addLines(mc.player, lines);
         }
 
-        // FIXME
-//        Tuple position = Config.hudPosition.getStartingPosition(this, resolution);
-        int x = 5;
-        int y = 5;
-//        x += Config.hudOffsetX * resolution.getScaledWidth();
-//        y += Config.hudOffsetY * resolution.getScaledHeight();
+        int x = Config.HUD.position.get().getX(mc.window.getScaledWidth(), getWidth(), MARGIN)
+                + Config.HUD.offsetX.get();
+        int y = Config.HUD.position.get().getY(mc.window.getScaledHeight(), getHeight(), MARGIN)
+                + Config.HUD.offsetY.get();
+
+        // Move bottom center up so it's not over the hotbar
+        if (Config.HUD.position.get() == Anchor.BOTTOM_CENTER) {
+            y -= 50;
+        }
 
         int longestWidth = getWidth();
 
