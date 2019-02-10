@@ -24,11 +24,11 @@ public abstract class MixinInGameHud extends Drawable {
         HudRenderObject renderObject = RayTraceHelper.getRenderObject(float_1);
 
         if (renderObject != null) {
+            // Active render object to render
             renderObject.render(float_1);
         } else {
-            HudRenderObject.adjustBackgroundHeight(float_1, HudRenderObject.lastMaxBackgroundHeight, false);
-            HudRenderObject.renderBackground(HudRenderObject.lastMaxBackgroundWidth,
-                    HudRenderObject.lastBackgroundPosX, HudRenderObject.lastBackgroundPosY);
+            // Render object gone, draw closing background image
+            HudRenderObject.handleClosingAnimation(float_1);
         }
     }
 }

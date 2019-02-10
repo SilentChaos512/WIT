@@ -27,10 +27,10 @@ public class HudRenderObject {
     public static boolean renderHud = true;
     private static double backgroundHeight = 0.0;
     // TODO: Why are these public?
-    public static int lastMaxBackgroundWidth = 0;
-    public static int lastMaxBackgroundHeight = 0;
-    public static int lastBackgroundPosX = 0;
-    public static int lastBackgroundPosY = 0;
+    private static int lastMaxBackgroundWidth = 0;
+    private static int lastMaxBackgroundHeight = 0;
+    private static int lastBackgroundPosX = 0;
+    private static int lastBackgroundPosY = 0;
     private static float lastPartialTicks = 0f;
 
     private final IInfoObject info;
@@ -78,17 +78,17 @@ public class HudRenderObject {
     }
 
     private static String format(TextComponent text) {
-        String line = text.getFormattedText();
-/*        if (text instanceof TranslatableTextComponent) {
-            // For some reason, translated text completely ignores formatting D:
-            // This just applies the missing formatting code
-            // NOTE: I verified this does not happen in vanilla 1.13.2 for advancement titles
-            return text.getStyle().getFormattingCode() + line;
-        }*/
-        return line;
+        // In 1.13, formatting was bugged, correction code has been removed,
+        // but I'll leave this method for now
+        return text.getFormattedText();
     }
 
-    public static void adjustBackgroundHeight(float partialTicks, int maxHeight, boolean expand) {
+    public static void handleClosingAnimation(float partialTicks) {
+        adjustBackgroundHeight(partialTicks, lastMaxBackgroundHeight, false);
+        renderClosingBackground();
+    }
+
+    private static void adjustBackgroundHeight(float partialTicks, int maxHeight, boolean expand) {
         float time = partialTicks - lastPartialTicks;
         if (time < 0f) {
             time += 1f;
@@ -101,7 +101,7 @@ public class HudRenderObject {
             if (backgroundHeight < 0.0) {
                 backgroundHeight = 0.0;
             }
-        } else if (expand) {
+        } else {
             backgroundHeight += time * maxHeight / BACKGROUND_TRANSITION_TIME;
             if (backgroundHeight > maxHeight) {
                 backgroundHeight = maxHeight;
@@ -109,7 +109,11 @@ public class HudRenderObject {
         }
     }
 
-    public static void renderBackground(int maxWidth, int posX, int posY) {
+    private static void renderClosingBackground() {
+        renderBackground(lastMaxBackgroundWidth, lastBackgroundPosX, lastBackgroundPosY);
+    }
+
+    private static void renderBackground(int maxWidth, int posX, int posY) {
         if (!renderHud || backgroundHeight <= 0.0) {
             return;
         }
