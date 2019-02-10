@@ -1,7 +1,5 @@
 package net.silentchaos512.wit.info;
 
-import net.fabricmc.fabric.api.tag.FabricItemTags;
-import net.fabricmc.fabric.impl.tools.ToolManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.tag.Tag;
 import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
@@ -25,6 +22,7 @@ import net.minecraft.world.BlockView;
 import net.silentchaos512.wit.api.InfoCallbacks;
 import net.silentchaos512.wit.api.WitHudInfoEvent;
 import net.silentchaos512.wit.config.Config;
+import net.silentchaos512.wit.lib.MiningLevelHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -50,30 +48,8 @@ public class BlockStackInfo extends ItemStackInfo {
         this.block = this.state.getBlock();
         this.pos = pos;
         this.blockEntity = tryGetTileEntity(world, this.pos);
-        this.harvestTool = getHarvestTool(state);
-        this.harvestLevel = getHarvestLevel(state);
-    }
-
-    @Nullable
-    private static Tag<Item> getHarvestTool(BlockState state) {
-        if (ToolManager.handleIsEffectiveOn(new ItemStack(Items.STICK), state).get())
-            return null;
-        if (ToolManager.handleIsEffectiveOn(new ItemStack(Items.DIAMOND_PICKAXE), state).get())
-            return FabricItemTags.PICKAXES;
-        if (ToolManager.handleIsEffectiveOn(new ItemStack(Items.DIAMOND_SHOVEL), state).get())
-            return FabricItemTags.SHOVELS;
-        if (ToolManager.handleIsEffectiveOn(new ItemStack(Items.DIAMOND_AXE), state).get())
-            return FabricItemTags.AXES;
-        if (ToolManager.handleIsEffectiveOn(new ItemStack(Items.DIAMOND_SWORD), state).get())
-            return FabricItemTags.SWORDS;
-        if (ToolManager.handleIsEffectiveOn(new ItemStack(Items.DIAMOND_HOE), state).get())
-            return FabricItemTags.HOES;
-        return null;
-    }
-
-    private static int getHarvestLevel(BlockState state) {
-        // TODO
-        return -1;
+        this.harvestTool = MiningLevelHelper.getHarvestTool(this.state);
+        this.harvestLevel = MiningLevelHelper.getLevel(this.harvestTool, this.state);
     }
 
     @Nullable
@@ -186,32 +162,29 @@ public class BlockStackInfo extends ItemStackInfo {
     private void getLinesForBlockHarvestability(PlayerEntity player, List<TextComponent> lines) {
         if (!Config.HUD.elementHarvest.isShownFor(player)) return;
 
-//        boolean canHarvest = ForgeHooks.canHarvestBlock(state, player, player.world, pos)
-//                && state.getBlockHardness(player.world, pos) >= 0;
-        boolean canHarvest = player.getMainHandStack().getItem().isEffectiveOn(state);
+        boolean canHarvest = player.isUsingEffectiveTool(state);
+        String mark = " " + (canHarvest ? "\u2713" : "\u2717"); // check mark or x
 
         if (harvestTool != null && harvestLevel > -1) {
             // Known tool
-            TextComponent tool = new TranslatableTextComponent("hud.wit.tool." + harvestTool);
+            TextComponent tool = new TranslatableTextComponent("hud.wit.tool." + harvestTool.getId().getPath());
             if (harvestLevel > 0) {
                 // Specific level
                 Config.HUD.elementHarvest.formatEither(player, () ->
                         new TranslatableTextComponent("hud.wit.harvestWithLevel", tool, harvestLevel), canHarvest)
-                        .ifPresent(lines::add);
+                        .ifPresent(t -> lines.add(t.append(mark)));
             } else {
                 // Any/unknown level
                 Config.HUD.elementHarvest.formatEither(player, () ->
                         new TranslatableTextComponent("hud.wit.harvestWith", tool), canHarvest)
-                        .ifPresent(lines::add);
+                        .ifPresent(t -> lines.add(t.append(mark)));
             }
         } else {
             // Unknown tool, but we know whether or not it can be harvested.
             Supplier<TextComponent> text = () ->
                     new TranslatableTextComponent("hud.wit.harvestable." + canHarvest);
-            Config.HUD.elementHarvest.formatEither(player, text, canHarvest).ifPresent(t -> {
-                String mark = " " + (canHarvest ? "\u2713" : "\u2717"); // check mark or x
-                lines.add(t.append(mark));
-            });
+            Config.HUD.elementHarvest.formatEither(player, text, canHarvest)
+                    .ifPresent(t -> lines.add(t.append(mark)));
         }
     }
 
