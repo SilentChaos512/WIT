@@ -2,17 +2,19 @@ package net.silentchaos512.wit.client.key;
 
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import net.silentchaos512.wit.Wit;
+import net.silentchaos512.wit.client.HudRenderObject;
 import org.lwjgl.glfw.GLFW;
 
 public final class KeyTracker {
     private static KeyTracker INSTANCE;
 
     private final FabricKeyBinding toggleHud;
-    private final FabricKeyBinding toggleAdvancedMode;
+//    private final FabricKeyBinding toggleAdvancedMode;
 
     private KeyTracker() {
         KeyBindingRegistry.INSTANCE.addCategory(Wit.MOD_NAME);
@@ -25,28 +27,24 @@ public final class KeyTracker {
         ).build();
         KeyBindingRegistry.INSTANCE.register(toggleHud);
 
-        toggleAdvancedMode = FabricKeyBinding.Builder.create(
+/*        toggleAdvancedMode = FabricKeyBinding.Builder.create(
                 new Identifier(Wit.MOD_ID, "toggle_advanced_info"),
                 InputUtil.Type.KEY_KEYBOARD,
                 GLFW.GLFW_KEY_KP_4,
                 Wit.MOD_NAME
         ).build();
-        KeyBindingRegistry.INSTANCE.register(toggleAdvancedMode);
+        KeyBindingRegistry.INSTANCE.register(toggleAdvancedMode);*/
     }
 
     public static void init() {
         if (INSTANCE != null) return;
         INSTANCE = new KeyTracker();
-    }
 
-/*    private void onKeyInput(KeyInputEvent event) {
-        if (toggleHud.isPressed()) {
-            HudRenderObject.renderHud = !HudRenderObject.renderHud;
-        } else if (toggleAdvancedMode.isPressed()) {
-//            Config.hudAdvancedMode = !Config.hudAdvancedMode;
-//            Config.save();
-        }
-    }*/
+        ClientTickCallback.EVENT.register(client -> {
+            if (INSTANCE.toggleHud.wasPressed())
+                HudRenderObject.renderHud = !HudRenderObject.renderHud;
+        });
+    }
 
     public static boolean shiftDown() {
         return eitherPressed(GLFW.GLFW_KEY_LEFT_SHIFT, GLFW.GLFW_KEY_RIGHT_SHIFT);

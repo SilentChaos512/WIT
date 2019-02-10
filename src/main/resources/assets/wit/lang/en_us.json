@@ -14,6 +14,7 @@
     "hud.wit.tool.scoop": "Scoop",
     "hud.wit.tool.shears": "Shears",
     "hud.wit.tool.shovel": "Shovel",
+    "key.wit.toggle_overlay": "Toggle Overlay",
     "tooltip.wit.food": "Food: %d (%.1f)",
     "tooltip.wit.tool.speed": "Base harvest speed: %.1f",
     "tooltip.wit.tool.maxDamage": "Max damage: %d"

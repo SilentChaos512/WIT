@@ -2,7 +2,7 @@
   "id": "wit",
   "name": "WIT: Fabric Edition",
   "description": "What Is That? Minimalistic overlay for block and entity info.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "side": "universal",
   "initializers": [
     "net.silentchaos512.wit.Wit",
