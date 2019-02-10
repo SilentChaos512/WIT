@@ -6,21 +6,22 @@ import net.minecraft.text.TextComponent;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class WitHudInfoEvent /*extends WorldEvent*/ {
+public class WitHudInfoEvent<I extends IInfoObject> {
     private final List<TextComponent> lines;
     private final PlayerEntity player;
-    private final boolean isSneaking;
-    private final boolean advanced;
+    private final World world;
+    private final I info;
+    private final IInfoOptions options;
 
-    WitHudInfoEvent(PlayerEntity player, World world, boolean advanced) {
-//        super(world);
+    @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+    public WitHudInfoEvent(PlayerEntity player, World world, I info, List<TextComponent> lines, IInfoOptions options) {
         this.player = player;
-        this.isSneaking = this.player.isSneaking();
-        this.advanced = advanced;
-        this.lines = new ArrayList<>();
+        this.world = world;
+        this.info = info;
+        this.options = options;
+        this.lines = lines;
     }
 
     public void add(TextComponent line) {
@@ -35,20 +36,24 @@ public class WitHudInfoEvent /*extends WorldEvent*/ {
         this.lines.add(new TranslatableTextComponent(translationKey, formatArgs));
     }
 
+    @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
     public List<TextComponent> getLines() {
-        // TODO: Return a copy?
         return lines;
+    }
+
+    public I getInfo() {
+        return info;
     }
 
     public PlayerEntity getPlayer() {
         return player;
     }
 
-    public boolean isAdvanced() {
-        return advanced;
+    public World getWorld() {
+        return world;
     }
 
-    public boolean isSneaking() {
-        return isSneaking;
+    public IInfoOptions getOptions() {
+        return options;
     }
 }

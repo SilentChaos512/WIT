@@ -5,7 +5,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.TextComponent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.silentchaos512.wit.api.InfoCallbacks;
 import net.silentchaos512.wit.api.WitBlockReplacements;
+import net.silentchaos512.wit.api.WitHudInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
 import javax.annotation.Nonnull;
@@ -47,6 +49,9 @@ public class ItemStackInfo extends ObjectInfo {
 
         // Registry name
         Config.HUD.elementRegistryName.format(player, this::displayRegistryName).ifPresent(lines::add);
+
+        // Info Event
+        InfoCallbacks.postItemInfo(new WitHudInfoEvent<>(player, player.world, this, lines, Config.GENERAL.advancedMode::get));
 
         // Mod name
         Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);

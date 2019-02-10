@@ -20,7 +20,8 @@ import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
-import net.silentchaos512.wit.api.WitBlockInfoEvent;
+import net.silentchaos512.wit.api.InfoCallbacks;
+import net.silentchaos512.wit.api.WitHudInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
 import javax.annotation.Nullable;
@@ -95,7 +96,7 @@ public class BlockStackInfo extends ItemStackInfo {
         Config.HUD.elementRegistryName.format(player, this::displayRegistryName).ifPresent(lines::add);
 
         // Wit HUD info event
-        processInfoEvent(lines, new WitBlockInfoEvent(player, player.world, Config.GENERAL.advancedMode.get(), pos, state));
+        InfoCallbacks.postBlockInfo(new WitHudInfoEvent<>(player, player.world, this, lines, Config.GENERAL.advancedMode::get));
 
         // Mod name
         Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);

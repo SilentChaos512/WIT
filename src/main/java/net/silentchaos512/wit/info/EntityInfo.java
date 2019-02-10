@@ -7,7 +7,8 @@ import net.minecraft.text.TextComponent;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import net.silentchaos512.wit.api.WitEntityInfoEvent;
+import net.silentchaos512.wit.api.InfoCallbacks;
+import net.silentchaos512.wit.api.WitHudInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
 import java.util.List;
@@ -43,7 +44,7 @@ public class EntityInfo extends ObjectInfo {
         Config.HUD.elementRegistryName.format(player, this::displayRegistryName).ifPresent(lines::add);
 
         // Wit HUD info event
-        processInfoEvent(lines, new WitEntityInfoEvent(player, entity.world, Config.GENERAL.advancedMode.get(), entity));
+        InfoCallbacks.postEntityInfo(new WitHudInfoEvent<>(player, player.world, this, lines, Config.GENERAL.advancedMode::get));
 
         // Mod name
         Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);

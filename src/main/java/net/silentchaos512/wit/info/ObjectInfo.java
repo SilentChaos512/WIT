@@ -6,11 +6,9 @@ import net.minecraft.text.StringTextComponent;
 import net.minecraft.text.TextComponent;
 import net.minecraft.util.Identifier;
 import net.silentchaos512.wit.api.IInfoObject;
-import net.silentchaos512.wit.api.WitHudInfoEvent;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class ObjectInfo implements IInfoObject {
@@ -61,9 +59,4 @@ public abstract class ObjectInfo implements IInfoObject {
         return new StringTextComponent(name.toString());
     }
 
-    static void processInfoEvent(List<TextComponent> lines, WitHudInfoEvent event) {
-        /*if (!MinecraftForge.EVENT_BUS.post(event)) {
-            lines.addAll(event.getLines());
-        }*/
-    }
 }
