@@ -3,7 +3,7 @@ package net.silentchaos512.wit.gui;
 public class GuiConfigWit /*extends GuiConfig*/ {
 //  public GuiConfigWit(GuiScreen parent) {
 //
-//    super(parent, Config.getConfigElements(), WIT.MOD_ID, false, false, "WIT Config");
+//    super(parent, Config.getConfigElements(), Wit.MOD_ID, false, false, "Wit Config");
 //  }
 //
 //  @Override

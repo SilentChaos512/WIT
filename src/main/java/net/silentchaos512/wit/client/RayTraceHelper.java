@@ -1,12 +1,14 @@
 package net.silentchaos512.wit.client;
 
-import net.minecraft.block.BlockFlowingFluid;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FluidBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.config.Config;
@@ -25,24 +27,24 @@ public final class RayTraceHelper {
 
     @Nullable
     public static HudRenderObject getRenderObject(float partialTicks) {
-        Minecraft mc = Minecraft.getInstance();
-        Entity renderViewEntity = mc.getRenderViewEntity();
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Entity renderViewEntity = mc.getCameraEntity();
         if (renderViewEntity == null) return null;
 
         World world = renderViewEntity.world;
 
-        RayTraceResult rt = mc.objectMouseOver;
+        HitResult rt = mc.hitResult;
 
         if (rt != null) {
-            if (rt.entity != null) {
+            if (rt.getType() == HitResult.Type.ENTITY) {
                 // Looking at an entity (longer sticky time)
-                IInfoObject info = infoForEntity(rt);
+                IInfoObject info = infoForEntity((EntityHitResult) rt);
                 previousInfo = info;
                 stickyTimeout = Config.HUD.entityStickyTime.get() * 20;
                 return new HudRenderObject(info);
-            } else {
+            } else if (rt.getType() == HitResult.Type.BLOCK) {
                 // Looking at a block?
-                IInfoObject info = infoForBlock(rt, world);
+                IInfoObject info = infoForBlock((BlockHitResult) rt, world);
                 if (info != null) {
                     previousInfo = info;
                     stickyTimeout = Config.HUD.blockStickyTime.get() * 20;
@@ -60,22 +62,22 @@ public final class RayTraceHelper {
         return null;
     }
 
-    private static IInfoObject infoForEntity(RayTraceResult rt) {
-        return new EntityInfo(rt.entity);
+    private static IInfoObject infoForEntity(EntityHitResult rt) {
+        return new EntityInfo(rt.getEntity());
     }
 
-    private static IInfoObject infoForBlock(RayTraceResult rt, World world) {
+    private static IInfoObject infoForBlock(BlockHitResult rt, World world) {
         BlockPos pos = rt.getBlockPos();
-        IBlockState state = world.getBlockState(pos);
-        if (state.isAir(world, pos)) return null;
+        BlockState state = world.getBlockState(pos);
+        if (state.isAir()) return null;
 
         // Pick block will return something valid in most cases
-        ItemStack pickBlockStack = state.getPickBlock(rt, world, pos, Minecraft.getInstance().player);
+        ItemStack pickBlockStack = state.getBlock().getPickStack(world, pos, state);
         ItemStack blockStack = new ItemStack(state.getBlock());
 
         if (pickBlockStack.isEmpty() && blockStack.isEmpty()) {
             // No information to work with? Water does this.
-            if (state.getBlock() instanceof BlockFlowingFluid) {
+            if (state.getBlock() instanceof FluidBlock) {
                 // Ignore water/lava. Should we be more specific?
                 return null;
             }

@@ -1,10 +1,11 @@
 package net.silentchaos512.wit.config;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TextFormat;
+import net.silentchaos512.utils.config.ConfigSpecWrapper;
+import net.silentchaos512.utils.config.EnumValue;
 import net.silentchaos512.wit.client.key.KeyTracker;
 
 import javax.annotation.Nullable;
@@ -25,49 +26,44 @@ public class ConfigValueTextElement {
         SHIFT_KEY(p -> KeyTracker.shiftDown()),
         ALWAYS(p -> true);
 
-        final Predicate<EntityPlayer> shouldShow;
+        final Predicate<PlayerEntity> shouldShow;
 
-        ShowCondition(Predicate<EntityPlayer> shouldShow) {
+        ShowCondition(Predicate<PlayerEntity> shouldShow) {
             this.shouldShow = shouldShow;
         }
 
-        private boolean test(EntityPlayer player) {
+        private boolean test(PlayerEntity player) {
             return shouldShow.test(player);
         }
     }
 
-    private Supplier<ShowCondition> showCondition;
-    private Supplier<TextFormatting> formatPrimary;
-    private Supplier<TextFormatting> formatSecondary;
+    private EnumValue<ShowCondition> showCondition;
+    private EnumValue<TextFormat> formatPrimary;
+    private EnumValue<TextFormat> formatSecondary;
 
-    public static ConfigValueTextElement define(ForgeConfigSpec.Builder builder, String name, String comment, ShowCondition defaultCondition, TextFormatting format1) {
-        return define(builder, name, comment, defaultCondition, format1, null);
+    public static ConfigValueTextElement define(ConfigSpecWrapper wrapper, String name, String comment, ShowCondition defaultCondition, TextFormat format1) {
+        return define(wrapper, name, comment, defaultCondition, format1, null);
     }
 
-    public static ConfigValueTextElement define(ForgeConfigSpec.Builder builder, String name, String comment, ShowCondition defaultCondition, TextFormatting format1, @Nullable TextFormatting format2) {
-        // fix parameter formatting later
+    public static ConfigValueTextElement define(ConfigSpecWrapper wrapper, String name, String comment, ShowCondition defaultCondition, TextFormat format1, @Nullable TextFormat format2) {
         ConfigValueTextElement result = new ConfigValueTextElement();
+        wrapper.comment(name, comment);
 
-        builder.comment(comment);
-        builder.push(name);
-
-        result.showCondition = Config.defineEnumWorkaround(builder, "show", defaultCondition);
-        result.formatPrimary = Config.defineEnumWorkaround(builder, "format", format1);
+        result.showCondition = wrapper.builder(name + ".show").defineEnum(defaultCondition);
+        result.formatPrimary = wrapper.builder(name + ".format").defineEnum(format1);
         if (format2 != null) {
-            result.formatSecondary = Config.defineEnumWorkaround(builder, "format2", format2);
+            result.formatSecondary = wrapper.builder(name + ".format2").defineEnum(format2);
         }
-
-        builder.pop();
 
         return result;
     }
 
-    public boolean isShownFor(EntityPlayer player) {
+    public boolean isShownFor(PlayerEntity player) {
         return showCondition.get().test(player);
     }
 
     /**
-     * Format the ITextComponent based on config settings. The Supplier is not called if this
+     * Format the TextComponent based on config settings. The Supplier is not called if this
      * element will not be shown.
      *
      * @param player The client player
@@ -75,15 +71,15 @@ public class ConfigValueTextElement {
      * @return The text formatted with formatPrimary, or an empty Optional if the text should not be
      * displayed.
      */
-    public Optional<ITextComponent> format(EntityPlayer player, Supplier<ITextComponent> text) {
+    public Optional<TextComponent> format(PlayerEntity player, Supplier<TextComponent> text) {
         if (!isShownFor(player))
             return Optional.empty();
-        return Optional.of(text.get().applyTextStyle(formatPrimary.get()));
+        return Optional.of(text.get().applyFormat(formatPrimary.get()));
     }
 
     /**
-     * Same as {@link #format(EntityPlayer, Supplier)}, but uses formatSecondary. Format the
-     * ITextComponent based on config settings. The Supplier is not called if this element will not
+     * Same as {@link #format(PlayerEntity, Supplier)}, but uses formatSecondary. Format the
+     * TextComponent based on config settings. The Supplier is not called if this element will not
      * be shown.
      *
      * @param player The client player
@@ -91,17 +87,17 @@ public class ConfigValueTextElement {
      * @return The formatted text, or an empty Optional if the text should not be displayed or
      * formatSecondary produces null.
      */
-    public Optional<ITextComponent> format2(EntityPlayer player, Supplier<ITextComponent> text) {
+    public Optional<TextComponent> format2(PlayerEntity player, Supplier<TextComponent> text) {
         if (!isShownFor(player) || formatSecondary.get() == null)
             return Optional.empty();
-        return Optional.of(text.get().applyTextStyle(formatSecondary.get()));
+        return Optional.of(text.get().applyFormat(formatSecondary.get()));
     }
 
     /**
-     * Calls {@link #format(EntityPlayer, Supplier)} if formatCondition is true, or {@link
-     * #format2(EntityPlayer, Supplier)} otherwise. Used for harvestability.
+     * Calls {@link #format(PlayerEntity, Supplier)} if formatCondition is true, or {@link
+     * #format2(PlayerEntity, Supplier)} otherwise. Used for harvestability.
      */
-    public Optional<ITextComponent> formatEither(EntityPlayer player, Supplier<ITextComponent> text, boolean formatCondition) {
+    public Optional<TextComponent> formatEither(PlayerEntity player, Supplier<TextComponent> text, boolean formatCondition) {
         return formatCondition ? format(player, text) : format2(player, text);
     }
 }

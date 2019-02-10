@@ -1,183 +1,40 @@
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "3.+", changing: true
-    }
-}
 plugins {
-    id 'maven'
-    id 'maven-publish'
-    id "com.jfrog.bintray" version "1.8.4"
-    id "com.matthewprenger.cursegradle" version "1.1.0"
+    id 'fabric-loom' version '0.2.0-SNAPSHOT'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
-//apply plugin: 'eclipse'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-repositories {
-    flatDir {
-        name "fileRepo"
-        dirs "repo"
-    }
-    mavenLocal()
-}
-
-def versionInfo = getGitVersion()
-version = "${versionInfo['version']}"
-
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+archivesBaseName = "wit-f"
+version = "1.0.0"
 
 minecraft {
-    mappings channel: "${project.mcp_mappings_channel}".toString(),
-             version: "${project.mcp_mappings_version}".toString()
+}
 
-    runs {
-        client = {
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
-        }
-        server = {
-            workingDirectory project.file('run').canonicalPath
-        }
-    }
+repositories {
+    mavenLocal()
+    mavenCentral()
 }
 
 dependencies {
-    minecraft 'net.minecraftforge.test:forge:1.13-24.0.166-1.13-pre'
-}
+    minecraft "com.mojang:minecraft:19w06a"
+    mappings "net.fabricmc:yarn:19w06a.3"
+    modCompile "net.fabricmc:fabric-loader:0.3.5.106"
 
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property 'version', "${versionInfo['version']}"
-    inputs.property 'mcversion', "${project.mc_version}"
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modCompile "net.fabricmc:fabric:0.2.0.91"
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META_INF/mods.toml'
-                
-        // replace version and mcversion
-        expand 'version': "${versionInfo['version']}", 'mcversion': "${project.mc_version}"
-    }
-
-    // copy everything else except the mods.toml
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META_INF/mods.toml'
+    compile "com.google.code.findbugs:jsr305:3.0.2"
+    compile 'com.electronwill.night-config:toml:3.4.0'
+    compile("net.silentchaos512:silent-utils:1.+") {
+        exclude module: 'guava'
     }
 }
 
-jar {
-    appendix = "${project.mc_version}"
-}
-
-task sourcesJar(type: Jar) {
-    appendix = "${project.mc_version}"
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
-    from sourceSets.main.allJava
+    from sourceSets.main.allSource
 }
-
-task javadocJar(type: Jar) {
-    appendix = "${project.mc_version}"
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-publishing {
-    publications {
-        WIT(MavenPublication) {
-            groupId 'net.silentchaos512'
-            artifactId 'wit'
-            version "${versionInfo['version_short']}".toString()
-
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
-        }
-    }
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
-    publications = ['WIT']
-
-    pkg {
-        repo = 'wit'
-        name = 'wit'
-        licenses = ["LGPL-3.0"]
-        vcsUrl = 'https://github.com/SilentChaos512/WIT.git'
-
-        version {
-            name = "${versionInfo['version_short']}".toString()
-            desc = "WIT (1.13) ${versionInfo['version_short']}".toString()
-            released = new Date()
-            vcsTag = "v${versionInfo['version_short']}".toString()
-//            attributes = []
-        }
-    }
-}
-
-// Version stuff
-
-def getGitVersion() {
-    def out = [:]
-
-    // Call git command
-    def outStream = new ByteArrayOutputStream()
-    def result = exec {
-        executable = 'git'
-        args = [ 'describe', '--long' ]
-        standardOutput = outStream
-    }
-
-    def fullVersion = outStream.toString().trim()
-    def matcher = fullVersion =~ /(\d+).(\d+).(\d+)-(.*)/
-
-    def maj = matcher[0][1]
-    def min = matcher[0][2]
-    def rev = matcher[0][3]
-    def bn = getBuildNumber()
-
-    out['build.major.number'] = maj.toString()
-    out['build.minor.number'] = min.toString()
-    out['build.revision.number'] = rev.toString()
-    out['build.githash'] = matcher[0][4].toString()
-    out['build.number'] = bn.toString()
-    out['version_short'] = "${maj}.${min}.${rev}".toString()
-    out['version'] = "${maj}.${min}.${rev}+${bn}".toString()
-
-    return out;
-}
-
-// Build number tracking
-
-String getBuildNumber() {
-    def versionFile = file('version.properties')
-    if (versionFile.canRead()) {
-        Properties versionProps = new Properties()
-        versionProps.load(new FileInputStream(versionFile))
-        return versionProps['build_num'].toString()
-    }
-    return "1"
-}
-
-task incrementBuild {
-    doFirst {
-        def versionFile = file('version.properties')
-        if (versionFile.canRead()) {
-            Properties versionProps = new Properties()
-            versionProps.load(new FileInputStream(versionFile))
-            def num = versionProps['build_num'].toInteger() + 1
-            println("incrementing BuildNumber to: " + num)
-            versionProps['build_num'] = num.toString()
-            versionProps.store(versionFile.newWriter(), null)
-        } else {
-            println("version.properties file not found! Ignoring.")
-        }
-    }
-}
-build.finalizedBy incrementBuild

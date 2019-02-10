@@ -1,9 +1,10 @@
 package net.silentchaos512.wit.info;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.config.Config;
 
@@ -12,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemStackInfo extends ObjectInfo {
-    final ItemStack stack;
+    private final ItemStack stack;
 
     public ItemStackInfo(@Nonnull ItemStack stack) {
         super(nameFor(replacementFor(stack)));
         this.stack = replacementFor(stack);
     }
 
-    private static ResourceLocation nameFor(ItemStack stack) {
-        ResourceLocation regName = stack.getItem().getRegistryName();
-        return regName != null ? regName : new ResourceLocation("unknown_item_error");
+    private static Identifier nameFor(ItemStack stack) {
+        Identifier regName = Registry.ITEM.getId(stack.getItem());
+        return regName != null ? regName : new Identifier("unknown_item_error");
     }
 
     private static ItemStack replacementFor(ItemStack stack) {
@@ -40,7 +41,7 @@ public class ItemStackInfo extends ObjectInfo {
     }
 
     @Override
-    public void addLines(EntityPlayer player, List<ITextComponent> lines) {
+    public void addLines(PlayerEntity player, List<TextComponent> lines) {
         // Name
         Config.HUD.elementName.format(player, this::displayItemName).ifPresent(lines::add);
 
@@ -55,7 +56,7 @@ public class ItemStackInfo extends ObjectInfo {
         return stack;
     }
 
-    ITextComponent displayItemName() {
+    TextComponent displayItemName() {
 //        return stack.getDisplayName().applyTextStyle(stack.getRarity().color);
         return stack.getDisplayName();
     }

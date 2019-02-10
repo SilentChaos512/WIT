@@ -1,12 +1,12 @@
 package net.silentchaos512.wit.api;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.item.Items;
 import net.silentchaos512.wit.config.Config;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -27,22 +27,22 @@ public class WitBlockReplacements implements IBlockReplacements {
         INSTANCE.addForInfestedBlock(Blocks.INFESTED_STONE_BRICKS, Blocks.STONE_BRICKS);
     }
 
-    private void addForInfestedBlock(IItemProvider infested, IItemProvider normal) {
+    private void addForInfestedBlock(ItemProvider infested, ItemProvider normal) {
         add(infested, () -> new ItemStack(Config.GENERAL.disguiseInfestedBlocks.get() ? normal : infested));
     }
 
-    private static String keyFor(IItemProvider blockOrItem) {
-        return Objects.requireNonNull(blockOrItem.asItem().getRegistryName()).toString();
+    private static String keyFor(ItemProvider blockOrItem) {
+        return blockOrItem.getItem().getTranslationKey();
     }
 
     private static String keyFor(ItemStack stack) {
         if (stack.isEmpty()) {
-            return "minecraft:air";
+            return Items.AIR.getTranslationKey();
         }
-        return Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
+        return stack.getItem().getTranslationKey();
     }
 
-    public void add(IItemProvider actual, Supplier<ItemStack> display) {
+    public void add(ItemProvider actual, Supplier<ItemStack> display) {
         map.put(keyFor(actual), display);
     }
 

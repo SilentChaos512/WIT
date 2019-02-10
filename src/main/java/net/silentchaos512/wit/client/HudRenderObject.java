@@ -1,15 +1,13 @@
 package net.silentchaos512.wit.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.silentchaos512.wit.WIT;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.text.TextComponent;
+import net.minecraft.util.Identifier;
+import net.silentchaos512.wit.Wit;
 import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.lib.TextAlignment;
@@ -22,7 +20,7 @@ public class HudRenderObject {
     private static final int VERTICAL_LINE_SPACING = 2;
     private static final int BACKGROUND_PADDING = 3;
     private static final int BACKGROUND_TRANSITION_TIME = 4;
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(WIT.MOD_ID, "textures/background.png");
+    private static final Identifier BACKGROUND_TEXTURE = new Identifier(Wit.MOD_ID, "textures/background.png");
 
     public static boolean renderHud = true;
     private static double backgroundHeight = 0.0;
@@ -34,17 +32,16 @@ public class HudRenderObject {
     private static float lastPartialTicks = 0f;
 
     private final IInfoObject info;
-
-    private final List<ITextComponent> lines = new ArrayList<>();
+    private final List<TextComponent> lines = new ArrayList<>();
+    private final MinecraftClient mc;
 
     public HudRenderObject(IInfoObject info) {
         this.info = info;
+        this.mc = MinecraftClient.getInstance();
     }
 
-    public void render(RenderGameOverlayEvent event) {
+    public void render(float partialTicks) {
         if (!renderHud) return;
-
-        Minecraft mc = Minecraft.getInstance();
 
         // Get text
         if (info != null) {
@@ -61,37 +58,37 @@ public class HudRenderObject {
         int longestWidth = getWidth();
 
         // Render background
-        adjustBackgroundHeight(event, getHeight() + 2 * BACKGROUND_PADDING, true);
+        adjustBackgroundHeight(partialTicks, getHeight() + 2 * BACKGROUND_PADDING, true);
         renderBackground(longestWidth, x, y);
 
         // Render text
         final TextAlignment align = Config.HUD.textAlignment.get();
-        for (ITextComponent text : lines) {
+        for (TextComponent text : lines) {
             String line = format(text);
             int lineWidth = mc.fontRenderer.getStringWidth(line);
             int diff = longestWidth - lineWidth;
-            mc.fontRenderer.drawStringWithShadow(line, x + align.getPadding(diff), y, 0xFFFFFF);
-            y += VERTICAL_LINE_SPACING + mc.fontRenderer.FONT_HEIGHT;
+            mc.fontRenderer.drawWithShadow(line, x + align.getPadding(diff), y, 0xFFFFFF);
+            y += VERTICAL_LINE_SPACING + mc.fontRenderer.fontHeight;
         }
     }
 
-    private static String format(ITextComponent text) {
+    private static String format(TextComponent text) {
         String line = text.getFormattedText();
-        if (text instanceof TextComponentTranslation) {
+/*        if (text instanceof TranslatableTextComponent) {
             // For some reason, translated text completely ignores formatting D:
             // This just applies the missing formatting code
             // NOTE: I verified this does not happen in vanilla 1.13.2 for advancement titles
             return text.getStyle().getFormattingCode() + line;
-        }
+        }*/
         return line;
     }
 
-    public static void adjustBackgroundHeight(RenderGameOverlayEvent event, int maxHeight, boolean expand) {
-        float time = event.getPartialTicks() - lastPartialTicks;
+    public static void adjustBackgroundHeight(float partialTicks, int maxHeight, boolean expand) {
+        float time = partialTicks - lastPartialTicks;
         if (time < 0f) {
             time += 1f;
         }
-        lastPartialTicks = event.getPartialTicks();
+        lastPartialTicks = partialTicks;
 
         lastMaxBackgroundHeight = maxHeight;
         if (backgroundHeight > maxHeight || !expand) {
@@ -125,27 +122,26 @@ public class HudRenderObject {
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
 
-        Minecraft.getInstance().textureManager.bindTexture(BACKGROUND_TEXTURE);
+        MinecraftClient.getInstance().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         GL11.glColor4d(1, 1, 1, Config.HUD.backgroundOpacity.get());
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder vbuffer = tessellator.getBuffer();
-        vbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        BufferBuilder vbuffer = tessellator.getBufferBuilder();
+        vbuffer.begin(7, VertexFormats.POSITION_UV);
 //    vbuffer.putColorRGBA(255, 255, 255, (int) (255 * Config.hudBackgroundOpacity));
-        vbuffer.pos(x, y + height, 0).tex(0, 1).endVertex();
-        vbuffer.pos(x + width, y + height, 0).tex(1, 1).endVertex();
-        vbuffer.pos(x + width, y, 0).tex(1, 0).endVertex();
-        vbuffer.pos(x, y, 0).tex(0, 0).endVertex();
+        vbuffer.vertex(x, y + height, 0).texture(0, 1).next();
+        vbuffer.vertex(x + width, y + height, 0).texture(1, 1).next();
+        vbuffer.vertex(x + width, y, 0).texture(1, 0).next();
+        vbuffer.vertex(x, y, 0).texture(0, 0).next();
         tessellator.draw();
 
         GlStateManager.popMatrix();
     }
 
     private int getWidth() {
-        Minecraft mc = Minecraft.getInstance();
         int longest = 0;
 
-        for (ITextComponent text : lines) {
+        for (TextComponent text : lines) {
             int length = mc.fontRenderer.getStringWidth(format(text));
             longest = length > longest ? length : longest;
         }
@@ -154,7 +150,6 @@ public class HudRenderObject {
     }
 
     private int getHeight() {
-        Minecraft mc = Minecraft.getInstance();
-        return mc.fontRenderer.FONT_HEIGHT * lines.size() + VERTICAL_LINE_SPACING * (lines.size() - 1);
+        return mc.fontRenderer.fontHeight * lines.size() + VERTICAL_LINE_SPACING * (lines.size() - 1);
     }
 }

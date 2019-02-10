@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "net.silentchaos512.wit.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

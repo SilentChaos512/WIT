@@ -1,47 +1,46 @@
 package net.silentchaos512.wit.api;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class WitHudInfoEvent extends WorldEvent {
-    private final List<ITextComponent> lines;
-    private final EntityPlayer player;
+public class WitHudInfoEvent /*extends WorldEvent*/ {
+    private final List<TextComponent> lines;
+    private final PlayerEntity player;
     private final boolean isSneaking;
     private final boolean advanced;
 
-    WitHudInfoEvent(EntityPlayer player, World world, boolean advanced) {
-        super(world);
+    WitHudInfoEvent(PlayerEntity player, World world, boolean advanced) {
+//        super(world);
         this.player = player;
         this.isSneaking = this.player.isSneaking();
         this.advanced = advanced;
         this.lines = new ArrayList<>();
     }
 
-    public void add(ITextComponent line) {
+    public void add(TextComponent line) {
         this.lines.add(line);
     }
 
     public void add(String lineOfRawText) {
-        this.lines.add(new TextComponentString(lineOfRawText));
+        this.lines.add(new StringTextComponent(lineOfRawText));
     }
 
     public void add(String translationKey, Object... formatArgs) {
-        this.lines.add(new TextComponentTranslation(translationKey, formatArgs));
+        this.lines.add(new TranslatableTextComponent(translationKey, formatArgs));
     }
 
-    public List<ITextComponent> getLines() {
+    public List<TextComponent> getLines() {
         // TODO: Return a copy?
         return lines;
     }
 
-    public EntityPlayer getPlayer() {
+    public PlayerEntity getPlayer() {
         return player;
     }
 

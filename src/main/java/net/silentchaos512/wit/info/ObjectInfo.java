@@ -1,29 +1,51 @@
 package net.silentchaos512.wit.info;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
+import net.fabricmc.loader.FabricLoader;
+import net.fabricmc.loader.ModContainer;
+import net.minecraft.text.StringTextComponent;
+import net.minecraft.text.TextComponent;
+import net.minecraft.util.Identifier;
 import net.silentchaos512.wit.api.IInfoObject;
 import net.silentchaos512.wit.api.WitHudInfoEvent;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ObjectInfo implements IInfoObject {
-    private final ResourceLocation name;
-    private final ModContainer mod; // TODO: Is this needed?
+    private static final Map<String, ModContainer> MODS_BY_ID = new HashMap<>();
+    private final Identifier name;
     private final String modName;
 
-    ObjectInfo(ResourceLocation name) {
+    ObjectInfo(Identifier name) {
         this.name = name;
-        this.mod = ModList.get().getModContainerById(name.getNamespace()).orElse(null);
-        this.modName = this.mod != null ? mod.getModInfo().getDisplayName() : "Minecraft";
+        ModContainer mod = getModContainer(name);
+        this.modName = mod != null ? mod.getInfo().getName() : "Minecraft";
     }
 
-    public ResourceLocation getName() {
+    @Nullable
+    private static ModContainer getModContainer(Identifier objId) {
+        String modId = objId.getNamespace();
+        if ("minecraft".equals(modId)) return null;
+
+        if (MODS_BY_ID.containsKey(modId)) {
+            return MODS_BY_ID.get(modId);
+        }
+
+        // Haven't seen this mod yet, look for it then add to the map.
+        // TODO: Looks like Fabric intends to change this, so expect this to break!
+        for (ModContainer mod : FabricLoader.INSTANCE.getModContainers()) {
+            if (mod.getInfo().getId().equals(modId)) {
+                MODS_BY_ID.put(modId, mod);
+                return mod;
+            }
+        }
+        // Something has gone horribly wrong...
+        throw new IllegalStateException("Unknown mod ID: '" + modId + "' for object '" + objId + "'");
+    }
+
+    public Identifier getName() {
         return name;
     }
 
@@ -31,22 +53,17 @@ public abstract class ObjectInfo implements IInfoObject {
         return modName;
     }
 
-    @Nullable
-    public ModContainer getMod() {
-        return mod;
+    TextComponent displayModName() {
+        return new StringTextComponent(modName);
     }
 
-    ITextComponent displayModName() {
-        return new TextComponentString(modName);
+    TextComponent displayRegistryName() {
+        return new StringTextComponent(name.toString());
     }
 
-    ITextComponent displayRegistryName() {
-        return new TextComponentString(name.toString());
-    }
-
-    static void processInfoEvent(List<ITextComponent> lines, WitHudInfoEvent event) {
-        if (!MinecraftForge.EVENT_BUS.post(event)) {
+    static void processInfoEvent(List<TextComponent> lines, WitHudInfoEvent event) {
+        /*if (!MinecraftForge.EVENT_BUS.post(event)) {
             lines.addAll(event.getLines());
-        }
+        }*/
     }
 }

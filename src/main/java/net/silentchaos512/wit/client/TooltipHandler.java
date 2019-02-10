@@ -1,3 +1,4 @@
+/*
 package net.silentchaos512.wit.client;
 
 import net.minecraft.block.state.IBlockState;
@@ -97,3 +98,4 @@ public class TooltipHandler {
         return Blocks.STONE.getDefaultState();
     }
 }
+*/

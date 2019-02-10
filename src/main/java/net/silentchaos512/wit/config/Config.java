@@ -1,45 +1,43 @@
 package net.silentchaos512.wit.config;
 
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
-import net.silentchaos512.wit.WIT;
+import com.electronwill.nightconfig.core.ConfigSpec;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.ParsingMode;
+import com.electronwill.nightconfig.core.io.WritingMode;
+import net.fabricmc.loader.FabricLoader;
+import net.minecraft.text.TextFormat;
+import net.silentchaos512.utils.config.*;
 import net.silentchaos512.wit.lib.HudAnchor;
 import net.silentchaos512.wit.lib.TextAlignment;
 
-import javax.annotation.Nullable;
-import java.util.function.Supplier;
-
 public final class Config {
-    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    private static final ConfigSpec SPEC = new ConfigSpec();
+    private static final CommentedFileConfig CONFIG = CommentedFileConfig.builder(FabricLoader.INSTANCE.getConfigDirectory().toPath().resolve("wit-client.toml").toFile())
+            .parsingMode(ParsingMode.REPLACE)
+            .writingMode(WritingMode.REPLACE)
+            .autoreload()
+            .build();
+    private static final ConfigSpecWrapper WRAPPER = new ConfigSpecWrapper(CONFIG, SPEC);
 
-    public static final General GENERAL = new General(BUILDER);
-    public static final Hud HUD = new Hud(BUILDER);
-    public static final Tooltip TOOLTIP = new Tooltip(BUILDER);
+    public static final General GENERAL = new General(WRAPPER);
+    public static final Hud HUD = new Hud(WRAPPER);
+    public static final Tooltip TOOLTIP = new Tooltip(WRAPPER);
 
     public static class General {
         public final BooleanValue disguiseInfestedBlocks;
         public final BooleanValue advancedMode;
 
-        General(ForgeConfigSpec.Builder builder) {
-            builder.comment("General settings")
-                    .push("general");
+        General(ConfigSpecWrapper wrapper) {
+            CONFIG.setComment("general", "General settings");
 
-            disguiseInfestedBlocks = builder
+            disguiseInfestedBlocks = wrapper
+                    .builder("general.disguiseInfestedBlocks")
                     .comment("Infested (silverfish) blocks will be shown as their non-infested variants.")
-                    .define("disguiseInfestedBlocks", true);
-
-            advancedMode = builder
+                    .define(true);
+            advancedMode = wrapper
+                    .builder("general.showAdvancedInfo")
                     .comment("Display additional information which may not be useful to most players.")
-                    .define("advancedMode", false);
-
-            builder.pop(); //general
+                    .define(false);
         }
     }
 
@@ -51,9 +49,8 @@ public final class Config {
         public final IntValue offsetY;
         public final DoubleValue blockStickyTime;
         public final DoubleValue entityStickyTime;
-        // TODO: Change back to ConfigValue<...> when defineEnum is fixed
-        public final Supplier<HudAnchor> position;
-        public final Supplier<TextAlignment> textAlignment;
+        public final EnumValue<HudAnchor> position;
+        public final EnumValue<TextAlignment> textAlignment;
 
         public final ConfigValueTextElement elementEntityHealth;
         public final ConfigValueTextElement elementEntityArmor;
@@ -64,110 +61,108 @@ public final class Config {
         public final ConfigValueTextElement elementRegistryName;
         public final ConfigValueTextElement elementTileEntityMarker;
 
-        Hud(ForgeConfigSpec.Builder builder) {
-            builder.comment("HUD overlay settings")
-                    .push("hud");
+        Hud(ConfigSpecWrapper wrapper) {
+            wrapper.comment("hud", "HUD overlay settings");
 
-            backgroundOpacity = builder
-                    .comment("Opacity of the background image. 0 = fully transparent, 1 = fully opaque.")
-                    .defineInRange("backgroundOpacity", 0.8, 0, 1);
+            backgroundOpacity = wrapper
+                    .builder("hud.backgroundOpacity")
+                    .comment("Opacity of overlay background. 0 = fully transparent, 1 = fully opaque.")
+                    .defineInRange(0.8, 0, 1);
 
-            hideWhenGuiOpen = builder
+            hideWhenGuiOpen = wrapper
+                    .builder("hud.hideWhenGuiOpen")
                     .comment("Hide the HUD overlay when a GUI is open. Does not apply to any GUI that pauses the game.")
-                    .define("hideWhenGuiOpen", true);
+                    .define(true);
 
-            inventoryMaxLines = builder
+            inventoryMaxLines = wrapper
+                    .builder("hud.inventoryMaxLines")
                     .comment("The maximum number of items to display in inventory contents lists.")
-                    .defineInRange("inventoryMaxLines", 4, 0, 100);
+                    .defineInRange(4, 0, 100);
 
-            offsetX = builder
+            offsetX = wrapper
+                    .builder("hud.position.offsetX")
                     .comment("Offset for HUD position. Change if you need to fine-tune the position.")
-                    .defineInRange("position.offsetX", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    .defineInRange(0, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-            offsetY = builder
+            offsetY = wrapper
+                    .builder("hud.position.offsetY")
                     .comment("Offset for HUD position. Change if you need to fine-tune the position.")
-                    .defineInRange("position.offsetY", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                    .defineInRange(0, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-            builder.comment(
+            wrapper.comment("stickyTime",
                     "Sticky time is the length of time (in seconds) the HUD overlay will remain",
-                    "open after the target is out of range. Handy when entities can't be still!")
-                    .push("stickyTime");
+                    "open after the target is out of range. Handy when entities can't be still!");
 
-            blockStickyTime = builder.defineInRange("block", 1, 0, Double.MAX_VALUE);
-            entityStickyTime = builder.defineInRange("entity", 4, 0, Double.MAX_VALUE);
+            blockStickyTime = wrapper
+                    .builder("hud.stickyTime.block")
+                    .defineInRange(1, 0, Double.MAX_VALUE);
+            entityStickyTime = wrapper
+                    .builder("hud.stickyTime.entity")
+                    .defineInRange(4, 0, Double.MAX_VALUE);
 
-            builder.pop(); //stickyTime
+            position = wrapper
+                    .builder("hud.position.anchor")
+                    .comment("Position of the HUD overlay",
+                            EnumValue.allValuesComment(HudAnchor.class))
+                    .defineEnum(HudAnchor.TOP_CENTER);
+            textAlignment = wrapper
+                    .builder("hud.textAlignment")
+                    .comment("Alignment of text in the HUD overlay.",
+                            EnumValue.allValuesComment(TextAlignment.class))
+                    .defineEnum(TextAlignment.CENTER);
 
-//            position = builder
-//                    .comment("The position of the HUD overlay.",
-//                            validValuesComment(HudAnchor.class))
-//                    .defineEnum("position.anchor", HudAnchor.TOP_CENTER);
-            builder.comment("The position of the HUD overlay.", validValuesComment(HudAnchor.class));
-            position = defineEnumWorkaround(builder, "position.anchor", HudAnchor.TOP_CENTER);
+            wrapper.comment("hud.elements",
+                    "Settings for what is displayed in the HUD overlay.",
+                    "Valid values for \"show\": ALWAYS, NEVER, SNEAK_ONLY, CTRL_KEY, ALT_KEY");
 
-//            textAlignment = builder
-//                    .comment("Alignment (justification) of text in the HUD overlay.",
-//                            validValuesComment(TextAlignment.class))
-//                    .defineEnum("textAlignment", TextAlignment.CENTER);
-            builder.comment("Alignment of text in the HUD overlay.", validValuesComment(TextAlignment.class));
-            textAlignment = defineEnumWorkaround(builder, "textAlignment", TextAlignment.CENTER);
-
-            builder.comment("Settings for what is displayed in the HUD overlay.",
-                    "Valid values for \"show\": ALWAYS, NEVER, SNEAK_ONLY, CTRL_KEY, ALT_KEY")
-                    .push("elements");
-
-            elementEntityArmor = ConfigValueTextElement.define(builder,
-                    "entityArmor",
+            elementEntityArmor = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.entityArmor",
                     "Show the armor value of entities.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.WHITE);
+                    TextFormat.WHITE);
 
-            elementEntityHealth = ConfigValueTextElement.define(builder,
-                    "entityHealth",
+            elementEntityHealth = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.entityHealth",
                     "Show the health of entities.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.WHITE);
+                    TextFormat.WHITE);
 
-            elementHarvest = ConfigValueTextElement.define(builder,
-                    "harvestInfo",
+            elementHarvest = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.harvestInfo",
                     "Show the harvest level and tool of blocks.",
                     ConfigValueTextElement.ShowCondition.SNEAK_ONLY,
-                    TextFormatting.GREEN,
-                    TextFormatting.RED);
+                    TextFormat.GREEN,
+                    TextFormat.RED);
 
-            elementInventoryContents = ConfigValueTextElement.define(builder,
-                    "inventoryContents",
+            elementInventoryContents = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.inventoryContents",
                     "Show some of the items in inventory blocks.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.WHITE);
+                    TextFormat.WHITE);
 
-            elementModName = ConfigValueTextElement.define(builder,
-                    "modName",
+            elementModName = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.modName",
                     "Show the name of the mod.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.DARK_PURPLE);
+                    TextFormat.DARK_PURPLE);
 
-            elementName = ConfigValueTextElement.define(builder,
-                    "name",
+            elementName = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.name",
                     "Show the name of the block or entity.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.BOLD);
+                    TextFormat.BOLD);
 
-            elementRegistryName = ConfigValueTextElement.define(builder,
-                    "registryName",
+            elementRegistryName = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.registryName",
                     "Show the registry (internal) name of the block or entity.",
                     ConfigValueTextElement.ShowCondition.SNEAK_ONLY,
-                    TextFormatting.DARK_GRAY);
+                    TextFormat.DARK_GRAY);
 
-            elementTileEntityMarker = ConfigValueTextElement.define(builder,
-                    "tileEntityMarker",
-                    "Show \"[TE]\" next to the name of tile entities.",
+            elementTileEntityMarker = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.blockEntityMarker",
+                    "Show \"[BE]\" next to the name of block (tile) entities.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.DARK_GRAY);
-
-            builder.pop(); //elements
-
-            builder.pop(); //hud
+                    TextFormat.DARK_GRAY);
         }
     }
 
@@ -177,108 +172,40 @@ public final class Config {
         //        public final ConfigValueTextElement elementTags;
         public final ConfigValueTextElement elementTool;
 
-        Tooltip(ForgeConfigSpec.Builder builder) {
-            builder.comment("Settings for additional tooltip information",
-                    "Valid values for \"show\": ALWAYS, NEVER, SHIFT_KEY, CTRL_KEY, ALT_KEY")
-                    .push("tooltips");
+        Tooltip(ConfigSpecWrapper wrapper) {
+            wrapper.comment("tooltips",
+                    "Settings for additional tooltip information",
+                    "Valid values for \"show\": ALWAYS, NEVER, SHIFT_KEY, CTRL_KEY, ALT_KEY");
 
-            elementFood = ConfigValueTextElement.define(builder,
-                    "foodStats",
+            elementFood = ConfigValueTextElement.define(wrapper,
+                    "tooltips.foodStats",
                     "Show food properties",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.GRAY);
+                    TextFormat.GRAY);
 
-            elementModName = ConfigValueTextElement.define(builder,
-                    "modName",
+            elementModName = ConfigValueTextElement.define(wrapper,
+                    "tooltips.modName",
                     "Show the mod name",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
-                    TextFormatting.DARK_PURPLE);
+                    TextFormat.DARK_PURPLE);
 
 //            elementTags = ConfigValueTextElement.define(builder,
 //                    "tags",
 //                    "Show item tags",
 //                    ConfigValueTextElement.ShowCondition.SHIFT_KEY,
-//                    TextFormatting.GRAY);
+//                    TextFormat.GRAY);
 
-            elementTool = ConfigValueTextElement.define(builder,
-                    "toolStats",
+            elementTool = ConfigValueTextElement.define(wrapper,
+                    "tooltips.toolStats",
                     "Show basic properties of harvest tools",
                     ConfigValueTextElement.ShowCondition.SHIFT_KEY,
-                    TextFormatting.GRAY);
-
-            builder.pop(); //tooltips
+                    TextFormat.GRAY);
         }
     }
 
-    private static final ForgeConfigSpec spec = BUILDER.build();
+    private Config() {}
 
-    private Config() { }
-
-    @SubscribeEvent
-    public static void onLoad(final ModConfig.Loading configEvent) {
-        WIT.LOGGER.debug("Loaded config file {}", configEvent.getConfig().getFileName());
-    }
-
-    @SubscribeEvent
-    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
-        WIT.LOGGER.fatal("Config just got changed on the file system!");
-    }
-
-//    private static void loadFrom(final Path configRoot) {
-//        Path configFile = configRoot.resolve(WIT.MOD_ID + ".toml");
-////        spec.setConfigFile(configFile);
-//        WIT.LOGGER.debug("Loaded config from {}", configFile);
-//    }
-
-//    public static void load() {
-//        loadFrom(FMLPaths.CONFIGDIR.get());
-//    }
-
-    public static void register(FMLModLoadingContext ctx) {
-        ctx.registerConfig(ModConfig.Type.CLIENT, spec);
-    }
-
-    // Enum helper methods
-
-    private static <E extends Enum<E>> String validValuesComment(Class<E> enumClass) {
-        StringBuilder builder = new StringBuilder().append("Valid values: [");
-        E[] enumConstants = enumClass.getEnumConstants();
-        for (int i = 0; i < enumConstants.length; ++i) {
-            builder.append(enumConstants[i].name());
-            if (i < enumConstants.length - 1) {
-                builder.append(", ");
-            }
-        }
-        return builder.append("]").toString();
-    }
-
-    // FIXME: Forge build 83 defineEnum does not work. This is a workaround.
-    @Deprecated // remove when issue fixed
-    static <E extends Enum<E>> Supplier<E> defineEnumWorkaround(ForgeConfigSpec.Builder builder, String path, E defaultValue) {
-        Class<E> enumClass = defaultValue.getDeclaringClass();
-        ConfigValue<String> configValue = builder
-                .define(path, defaultValue::name, o -> validateEnum(o, enumClass));
-        return () -> getEnumByName(configValue.get(), defaultValue);
-    }
-
-    @Deprecated // remove when issue fixed
-    private static <E extends Enum<E>> E getEnumByName(String name, E defaultValue) {
-        for (E e : defaultValue.getDeclaringClass().getEnumConstants()) {
-            if (e.name().equalsIgnoreCase(name)) {
-                return e;
-            }
-        }
-        return defaultValue;
-    }
-
-    @Deprecated // remove when issue fixed
-    private static <E extends Enum<E>> boolean validateEnum(@Nullable Object obj, Class<E> enumClass) {
-        if (obj == null) return false;
-        for (E e : enumClass.getEnumConstants()) {
-            if (e.name().equalsIgnoreCase(obj.toString())) {
-                return true;
-            }
-        }
-        return false;
+    public static void init() {
+        WRAPPER.validate();
     }
 }
