@@ -18,7 +18,9 @@ import net.minecraft.text.TextComponent;
 import net.minecraft.text.TextFormat;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.DefaultedList;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.silentchaos512.wit.api.InfoCallbacks;
 import net.silentchaos512.wit.api.WitHudInfoEvent;
@@ -35,10 +37,15 @@ public class BlockStackInfo extends ItemStackInfo {
     private final BlockEntity blockEntity;
     @Nullable private final Tag<Item> harvestTool;
     private final int harvestLevel;
+    private boolean isPickBlock = true;
 
     public BlockStackInfo(BlockView world, BlockState state, BlockPos pos) {
-        super(new ItemStack(state.getBlock()));
+        this(new ItemStack(state.getBlock()), world, state, pos);
+        isPickBlock = false;
+    }
 
+    public BlockStackInfo(ItemStack stack, BlockView world, BlockState state, BlockPos pos) {
+        super(stack);
         this.state = state;
         this.block = this.state.getBlock();
         this.pos = pos;
@@ -100,6 +107,20 @@ public class BlockStackInfo extends ItemStackInfo {
 
         // Mod name
         Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);
+    }
+
+    @Override
+    TextComponent displayItemName() {
+        return isPickBlock ? block.getTextComponent() : super.displayItemName();
+    }
+
+    @Override
+    TextComponent displayRegistryName() {
+        if (isPickBlock) {
+            Identifier id = Registry.BLOCK.getId(block);
+            return new StringTextComponent(id.toString());
+        }
+        return super.displayRegistryName();
     }
 
     private TextComponent displayBlockName(PlayerEntity player, TextComponent text) {

@@ -5,8 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.TextComponent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.silentchaos512.wit.api.BlockDisguiser;
 import net.silentchaos512.wit.api.InfoCallbacks;
-import net.silentchaos512.wit.api.WitBlockReplacements;
 import net.silentchaos512.wit.api.WitHudInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
@@ -23,12 +23,11 @@ public class ItemStackInfo extends ObjectInfo {
     }
 
     private static Identifier nameFor(ItemStack stack) {
-        Identifier regName = Registry.ITEM.getId(stack.getItem());
-        return regName != null ? regName : new Identifier("unknown_item_error");
+        return Registry.ITEM.getId(stack.getItem());
     }
 
     private static ItemStack replacementFor(ItemStack stack) {
-        return WitBlockReplacements.INSTANCE.get(stack);
+        return BlockDisguiser.get(stack);
     }
 
     public List<String> getOreNames() {
@@ -62,7 +61,6 @@ public class ItemStackInfo extends ObjectInfo {
     }
 
     TextComponent displayItemName() {
-//        return stack.getDisplayName().applyTextStyle(stack.getRarity().color);
         return stack.getDisplayName();
     }
 }

@@ -15,7 +15,6 @@ import net.silentchaos512.wit.config.Config;
 import net.silentchaos512.wit.info.BlockStackInfo;
 import net.silentchaos512.wit.info.EntityInfo;
 import net.silentchaos512.wit.info.ErrorInfo;
-import net.silentchaos512.wit.info.ItemStackInfo;
 
 import javax.annotation.Nullable;
 
@@ -84,7 +83,8 @@ public final class RayTraceHelper {
             return new ErrorInfo("Block has no item?", state.toString());
         } else if (blockStack.isEmpty()) {
             // Block does not have an item, but we can work with the pick block stack.
-            return new ItemStackInfo(pickBlockStack);
+//            return new ItemStackInfo(pickBlockStack);
+            return new BlockStackInfo(pickBlockStack, world, state, pos);
         }
 
         // Handle block normally
