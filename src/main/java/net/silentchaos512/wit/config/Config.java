@@ -60,6 +60,7 @@ public final class Config {
         public final ConfigValueTextElement elementName;
         public final ConfigValueTextElement elementRegistryName;
         public final ConfigValueTextElement elementTileEntityMarker;
+        public final ConfigValueTextElement elementCropGrowth;
 
         Hud(ConfigSpecWrapper wrapper) {
             wrapper.comment("hud", "HUD overlay settings");
@@ -163,6 +164,13 @@ public final class Config {
                     "Show \"[BE]\" next to the name of block (tile) entities.",
                     ConfigValueTextElement.ShowCondition.ALWAYS,
                     TextFormat.DARK_GRAY);
+
+            elementCropGrowth = ConfigValueTextElement.define(wrapper,
+                    "hud.elements.cropGrowth",
+                    "Show age of crops",
+                    ConfigValueTextElement.ShowCondition.ALWAYS,
+                    TextFormat.GREEN,
+                    TextFormat.YELLOW);
         }
     }
 

@@ -2,6 +2,7 @@ package net.silentchaos512.wit.info;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.Entity;
@@ -71,6 +72,8 @@ public class BlockStackInfo extends ItemStackInfo {
         getLinesForEnergyStorage(lines);
         // Inventory?
         getLinesForBlockInventory(player, lines);
+        // Crops?
+        getLinesForCropGrowth(player, lines);
 
         // Harvestability
         getLinesForBlockHarvestability(player, lines);
@@ -105,6 +108,21 @@ public class BlockStackInfo extends ItemStackInfo {
             Config.HUD.elementTileEntityMarker.format(player, marker).ifPresent(text::append);
         }
         return text;
+    }
+
+    private void getLinesForCropGrowth(PlayerEntity player, List<TextComponent> lines) {
+        if (!Config.HUD.elementCropGrowth.isShownFor(player) || !(block instanceof CropBlock)) {
+            return;
+        }
+        CropBlock cropBlock = (CropBlock) block;
+        int age = state.get(cropBlock.getAgeProperty());
+        int maxAge = cropBlock.getCropAgeMaximum();
+        TextComponent growth = age >= maxAge
+                ? new TranslatableTextComponent("hud.wit.crops.age.mature")
+                : new StringTextComponent(age + "/" + maxAge);
+        Config.HUD.elementCropGrowth.formatEither(player, () ->
+                new TranslatableTextComponent("hud.wit.crops.age", growth), age >= maxAge)
+                .ifPresent(lines::add);
     }
 
     private void getLinesForBlockInventory(PlayerEntity player, List<TextComponent> lines) {
