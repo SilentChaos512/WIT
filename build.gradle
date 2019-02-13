@@ -16,6 +16,11 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    // Dependencies to pack into the jar
+    extraLibs
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:19w06a"
     mappings "net.fabricmc:yarn:19w06a.3"
@@ -24,10 +29,22 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modCompile "net.fabricmc:fabric:0.2.0.91"
 
-    compile "com.google.code.findbugs:jsr305:3.0.2"
-    compile 'com.electronwill.night-config:toml:3.4.0'
-    compile("net.silentchaos512:silent-utils:1.+") {
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    extraLibs "com.electronwill.night-config:toml:3.4.0"
+
+    extraLibs("net.silentchaos512:silent-utils:1.+") {
         exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'log4j-core'
+        exclude module: 'log4j-api'
+    }
+
+    configurations.implementation.extendsFrom(configurations.extraLibs)
+}
+
+jar {
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
@@ -37,4 +54,12 @@ dependencies {
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
+}
+
+runClient {
+    try {
+        jvmArgs += ['-Dlog4j.configurationFile', '../log4j-config.xml']
+    } catch (Exception ex) {
+        println('runClient: failed to add to JVM args')
+    }
 }
