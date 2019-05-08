@@ -3,24 +3,39 @@ package net.silentchaos512.wit.info;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.silentchaos512.wit.api.IInfoObject;
-import net.silentchaos512.wit.api.WitHudInfoEvent;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ObjectInfo implements IInfoObject {
+    private static final Map<String, ModContainer> MODS_BY_ID = new HashMap<>();
     private final ResourceLocation name;
-    private final ModContainer mod; // TODO: Is this needed?
     private final String modName;
 
     ObjectInfo(ResourceLocation name) {
         this.name = name;
-        this.mod = ModList.get().getModContainerById(name.getNamespace()).orElse(null);
-        this.modName = this.mod != null ? mod.getModInfo().getDisplayName() : "Minecraft";
+        ModContainer mod = getModContainer(name);
+        this.modName = mod != null ? mod.getModInfo().getDisplayName(): "Minecraft";
+    }
+
+    @Nullable
+    private static ModContainer getModContainer(ResourceLocation objId) {
+        String modId = objId.getNamespace();
+        if ("minecraft".equals(modId)) return null;
+
+        if (MODS_BY_ID.containsKey(modId)) {
+            return MODS_BY_ID.get(modId);
+        }
+
+        // Haven't seen this mod yet, look for it then add to the map.
+        ModContainer mod = ModList.get().getModContainerById(modId).orElseThrow(() ->
+                new IllegalStateException("Unknown mod ID: '" + modId + "' for object '" + objId + "'"));
+        MODS_BY_ID.put(modId, mod);
+        return mod;
     }
 
     public ResourceLocation getName() {
@@ -31,11 +46,6 @@ public abstract class ObjectInfo implements IInfoObject {
         return modName;
     }
 
-    @Nullable
-    public ModContainer getMod() {
-        return mod;
-    }
-
     ITextComponent displayModName() {
         return new TextComponentString(modName);
     }
@@ -44,9 +54,4 @@ public abstract class ObjectInfo implements IInfoObject {
         return new TextComponentString(name.toString());
     }
 
-    static void processInfoEvent(List<ITextComponent> lines, WitHudInfoEvent event) {
-        if (!MinecraftForge.EVENT_BUS.post(event)) {
-            lines.addAll(event.getLines());
-        }
-    }
 }

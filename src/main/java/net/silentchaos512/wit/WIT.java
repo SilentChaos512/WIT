@@ -17,12 +17,9 @@ import org.apache.logging.log4j.Logger;
 public class WIT {
     public static final String MOD_ID = "wit";
     public static final String MOD_NAME = "WIT";
-    public static final String VERSION_NUMBER = "1.1.1";
+    public static final String VERSION_NUMBER = "1.1.2";
 
     public static Logger LOGGER = LogManager.getLogger(MOD_NAME);
-
-    public boolean foundStorageDrawers = false;
-    public boolean foundMcMultiPart = false;
 
     public static WIT INSTANCE;
     private static SideProxy PROXY;
@@ -30,7 +27,6 @@ public class WIT {
     public WIT() {
         INSTANCE = this;
         PROXY = DistExecutor.runForDist(() -> () -> new SideProxy.Client(), () -> () -> new SideProxy.Server());
-//        Config.load();
 
         MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, WIT::onRenderOverlay);
     }
@@ -45,14 +41,13 @@ public class WIT {
             return;
         }
 
-        HudRenderObject renderObject = RayTraceHelper.getRenderObject(event.getPartialTicks());
+        float partialTicks = event.getPartialTicks();
+        HudRenderObject renderObject = RayTraceHelper.getRenderObject(partialTicks);
 
         if (renderObject != null) {
-            renderObject.render(event);
+            renderObject.render(partialTicks);
         } else {
-            HudRenderObject.adjustBackgroundHeight(event, HudRenderObject.lastMaxBackgroundHeight, false);
-            HudRenderObject.renderBackground(HudRenderObject.lastMaxBackgroundWidth,
-                    HudRenderObject.lastBackgroundPosX, HudRenderObject.lastBackgroundPosY);
+            HudRenderObject.handleClosingAnimation(partialTicks);
         }
     }
 }

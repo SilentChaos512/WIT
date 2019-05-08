@@ -4,7 +4,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.silentchaos512.utils.config.ConfigSpecWrapper;
+import net.silentchaos512.utils.config.EnumValue;
 import net.silentchaos512.wit.client.key.KeyTracker;
 
 import javax.annotation.Nullable;
@@ -36,28 +37,23 @@ public class ConfigValueTextElement {
         }
     }
 
-    private Supplier<ShowCondition> showCondition;
-    private Supplier<TextFormatting> formatPrimary;
-    private Supplier<TextFormatting> formatSecondary;
+    private EnumValue<ShowCondition> showCondition;
+    private EnumValue<TextFormatting> formatPrimary;
+    private EnumValue<TextFormatting> formatSecondary;
 
-    public static ConfigValueTextElement define(ForgeConfigSpec.Builder builder, String name, String comment, ShowCondition defaultCondition, TextFormatting format1) {
-        return define(builder, name, comment, defaultCondition, format1, null);
+    public static ConfigValueTextElement define(ConfigSpecWrapper wrapper, String name, String comment, ShowCondition defaultCondition, TextFormatting format1) {
+        return define(wrapper, name, comment, defaultCondition, format1, null);
     }
 
-    public static ConfigValueTextElement define(ForgeConfigSpec.Builder builder, String name, String comment, ShowCondition defaultCondition, TextFormatting format1, @Nullable TextFormatting format2) {
-        // fix parameter formatting later
+    public static ConfigValueTextElement define(ConfigSpecWrapper wrapper, String name, String comment, ShowCondition defaultCondition, TextFormatting format1, @Nullable TextFormatting format2) {
         ConfigValueTextElement result = new ConfigValueTextElement();
+        wrapper.comment(name, comment);
 
-        builder.comment(comment);
-        builder.push(name);
-
-        result.showCondition = Config.defineEnumWorkaround(builder, "show", defaultCondition);
-        result.formatPrimary = Config.defineEnumWorkaround(builder, "format", format1);
+        result.showCondition = wrapper.builder(name + ".show").defineEnum(defaultCondition);
+        result.formatPrimary = wrapper.builder(name + ".format").defineEnum(format1);
         if (format2 != null) {
-            result.formatSecondary = Config.defineEnumWorkaround(builder, "format2", format2);
+            result.formatSecondary = wrapper.builder(name + ".format2").defineEnum(format2);
         }
-
-        builder.pop();
 
         return result;
     }

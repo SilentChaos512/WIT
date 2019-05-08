@@ -2,10 +2,10 @@ package net.silentchaos512.wit.client.key;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.silentchaos512.wit.WIT;
 import net.silentchaos512.wit.client.HudRenderObject;
 import org.lwjgl.glfw.GLFW;
@@ -31,7 +31,7 @@ public final class KeyTracker {
         INSTANCE = new KeyTracker();
     }
 
-    private void onKeyInput(KeyInputEvent event) {
+    private void onKeyInput(InputEvent.KeyInputEvent event) {
         if (toggleHud.isPressed()) {
             HudRenderObject.renderHud = !HudRenderObject.renderHud;
         } else if (toggleAdvancedMode.isPressed()) {

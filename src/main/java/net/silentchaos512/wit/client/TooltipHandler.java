@@ -14,7 +14,7 @@ import net.silentchaos512.wit.info.ItemStackInfo;
 
 import java.util.List;
 
-public class TooltipHandler {
+public final class TooltipHandler {
     private static TooltipHandler INSTANCE;
 
     public static void init() {

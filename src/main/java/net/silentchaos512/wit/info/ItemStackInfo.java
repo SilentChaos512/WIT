@@ -4,7 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.silentchaos512.wit.api.WitBlockReplacements;
+import net.silentchaos512.wit.api.BlockDisguiser;
+import net.silentchaos512.wit.api.InfoCallbacks;
+import net.silentchaos512.wit.api.WitHudInfoEvent;
 import net.silentchaos512.wit.config.Config;
 
 import javax.annotation.Nonnull;
@@ -25,7 +27,7 @@ public class ItemStackInfo extends ObjectInfo {
     }
 
     private static ItemStack replacementFor(ItemStack stack) {
-        return WitBlockReplacements.INSTANCE.get(stack);
+        return BlockDisguiser.get(stack);
     }
 
     public List<String> getOreNames() {
@@ -47,6 +49,9 @@ public class ItemStackInfo extends ObjectInfo {
         // Registry name
         Config.HUD.elementRegistryName.format(player, this::displayRegistryName).ifPresent(lines::add);
 
+        // Info Event
+        InfoCallbacks.postItemInfo(new WitHudInfoEvent<>(player, player.world, this, lines, Config.GENERAL.advancedMode::get));
+
         // Mod name
         Config.HUD.elementModName.format(player, this::displayModName).ifPresent(lines::add);
     }
@@ -56,7 +61,6 @@ public class ItemStackInfo extends ObjectInfo {
     }
 
     ITextComponent displayItemName() {
-//        return stack.getDisplayName().applyTextStyle(stack.getRarity().color);
         return stack.getDisplayName();
     }
 }

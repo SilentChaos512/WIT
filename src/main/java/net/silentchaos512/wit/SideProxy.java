@@ -1,25 +1,23 @@
 package net.silentchaos512.wit;
 
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.*;
-import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
-import net.silentchaos512.wit.api.WitBlockReplacements;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.silentchaos512.wit.client.TooltipHandler;
 import net.silentchaos512.wit.client.key.KeyTracker;
 import net.silentchaos512.wit.config.Config;
 
 class SideProxy {
     SideProxy() {
-        WitBlockReplacements.init();
+        Config.init();
 
-        FMLModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::imcEnqueue);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
-
-        Config.register(FMLModLoadingContext.get());
+        IEventBus lifeCycleBus = FMLJavaModLoadingContext.get().getModEventBus();
+        lifeCycleBus.addListener(this::commonSetup);
+        lifeCycleBus.addListener(this::imcEnqueue);
+        lifeCycleBus.addListener(this::imcProcess);
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
-    }
+    private void commonSetup(FMLCommonSetupEvent event) { }
 
     private void imcEnqueue(InterModEnqueueEvent event) { }
 
@@ -30,7 +28,7 @@ class SideProxy {
             KeyTracker.init();
             TooltipHandler.init();
 
-            FMLModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
         }
 
         private void clientSetup(FMLClientSetupEvent event) { }
@@ -38,7 +36,7 @@ class SideProxy {
 
     static class Server extends SideProxy {
         Server() {
-            FMLModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
         }
 
         private void serverSetup(FMLDedicatedServerSetupEvent event) { }
