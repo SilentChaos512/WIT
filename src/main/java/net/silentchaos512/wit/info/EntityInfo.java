@@ -32,12 +32,15 @@ public class EntityInfo extends ObjectInfo {
         // Entity name
         Config.HUD.elementName.format(player, this::displayEntityName).ifPresent(lines::add);
 
-        // Health
+        // Health and armor
         if (entity instanceof EntityLivingBase) {
             EntityLivingBase entityLiving = (EntityLivingBase) entity;
             showHealth(player, entityLiving, lines);
 
-            // TODO: Armor?
+            int armorValue = entityLiving.getTotalArmorValue();
+            if (armorValue > 0) {
+                showArmor(player, entityLiving, armorValue, lines);
+            }
         }
 
         // Registry name
@@ -61,5 +64,12 @@ public class EntityInfo extends ObjectInfo {
         String max = String.format("%.1f", entity.getMaxHealth());
         Supplier<ITextComponent> text = () -> new TextComponentTranslation("hud.wit.entity.health", current, max);
         Config.HUD.elementEntityHealth.format(player, text).ifPresent(lines::add);
+    }
+
+    private static void showArmor(EntityPlayer player, EntityLivingBase entity, int armorValue, List<ITextComponent> lines) {
+        if (!Config.HUD.elementEntityArmor.isShownFor(player)) return;
+
+        Supplier<ITextComponent> text = () -> new TextComponentTranslation("hud.wit.entity.armor", armorValue);
+        Config.HUD.elementEntityArmor.format(player, text).ifPresent(lines::add);
     }
 }

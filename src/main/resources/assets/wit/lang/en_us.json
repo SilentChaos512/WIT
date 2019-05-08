@@ -1,5 +1,5 @@
 {
-    "hud.wit.entity.armor": "Armor: %s / %s",
+    "hud.wit.entity.armor": "Armor: %s",
     "hud.wit.entity.health": "HP: %s / %s",
     "hud.wit.harvestable.true": "Harvestable",
     "hud.wit.harvestable.false": "Not Harvestable",
