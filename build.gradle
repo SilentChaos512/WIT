@@ -200,29 +200,19 @@ curseforge {
             addGameVersion(project.mc_version)
             mainArtifact(jar) {
 //                displayName = "$project.description $display_version"
-                relations {
-                }
             }
-//            if (project.hasProperty('doAPIJar')) {
-//                addArtifact(apiJar) {
-//                    displayName = "$project.description $display_version API"
-//                }
-//            }
-//            if (project.hasProperty('doSourceJar')) {
-//                addArtifact(sourceJar) {
-//                    displayName = "$project.description $display_version Sources"
-//                }
-//            }
-//            if (project.hasProperty('doDeobfJar')) {
-//                addArtifact(deobfJar) {
-//                    displayName = "$project.description $display_version Development"
-//                }
-//            }
-//            if (project.hasProperty('doJavadocJar')) {
-//                addArtifact(javadocJar) {
-//                    displayName = "$project.description $display_version Javadoc"
-//                }
-//            }
+            if (project.hasProperty('doAPIJar')) {
+                addArtifact(apiJar)
+            }
+            if (project.hasProperty('doSourceJar')) {
+                addArtifact(sourcesJar)
+            }
+            if (project.hasProperty('doDeobfJar')) {
+                addArtifact(deobfJar)
+            }
+            if (project.hasProperty('doJavadocJar')) {
+                addArtifact(javadocJar)
+            }
         }
     }
 }
